@@ -41,6 +41,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -53,7 +54,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.csipsimple.R;
 import com.csipsimple.api.ISipService;
 import com.csipsimple.api.MediaState;
@@ -82,7 +82,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class InCallActivity extends SherlockFragmentActivity implements IOnCallActionTrigger, 
+public class InCallActivity extends AppCompatActivity implements IOnCallActionTrigger,
         IOnLeftRightChoice, ProximityDirector, OnDtmfListener {
     private static final int QUIT_DELAY = 3000;
     private final static String THIS_FILE = "InCallActivity";
@@ -133,7 +133,6 @@ public class InCallActivity extends SherlockFragmentActivity implements IOnCallA
     private final static int PICKUP_SIP_URI_XFER = 0;
     private final static int PICKUP_SIP_URI_NEW_CALL = 1;
     private static final String CALL_ID = "call_id";
-    
 
     @SuppressWarnings("deprecation")
     @Override
@@ -422,7 +421,7 @@ public class InCallActivity extends SherlockFragmentActivity implements IOnCallA
 
     /**
      * Get the call that is active on the view
-     * 
+     *
      * @param excludeHold if true we do not return cals hold locally
      * @return
      */
@@ -1518,9 +1517,6 @@ public class InCallActivity extends SherlockFragmentActivity implements IOnCallA
 
             return convertView;
         }
-        
     }
-
-
 
 }

@@ -26,77 +26,56 @@
 package com.csipsimple.ui.incall;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
-import com.actionbarsherlock.internal.view.menu.ActionMenuPresenter;
-import com.actionbarsherlock.internal.view.menu.ActionMenuView;
-import com.actionbarsherlock.internal.view.menu.MenuBuilder;
-import com.actionbarsherlock.internal.view.menu.MenuBuilder.Callback;
-import com.actionbarsherlock.internal.view.menu.MenuItemImpl;
-import com.actionbarsherlock.internal.view.menu.MenuView;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.R;
 import com.csipsimple.api.MediaState;
 import com.csipsimple.api.SipCallSession;
 import com.csipsimple.api.SipConfigManager;
 import com.csipsimple.utils.Log;
 
+import java.util.HashMap;
+
 /**
  * Manages in call controls not relative to a particular call such as media route
  */
-public class InCallControls extends FrameLayout implements Callback {
+public class InCallControls extends FrameLayout {
 
 	private static final String THIS_FILE = "InCallControls";
 	IOnCallActionTrigger onTriggerListener;
 	
 	private MediaState lastMediaState;
 	private SipCallSession currentCall;
-    private MenuBuilder btnMenuBuilder;
+//    private MenuBuilder btnMenuBuilder;
 	private boolean supportMultipleCalls = false;
 
+    private ImageButton speakerButton, muteButton, bluetoothButton, addCallButton, mediaSettingsButton;
+
+    HashMap<Integer,Boolean> btnStates = new HashMap<>();
+    int BTN_STAT_DEFAULT = Color.BLUE;
 
 	public InCallControls(Context context) {
         this(context, null, 0);
     }
-	
+
 	public InCallControls(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 	
     public InCallControls(Context context, AttributeSet attrs, int style) {
         super(context, attrs, style);
-        
+        inflate(getContext(), R.layout.in_call_controls, this);
+
+        initButtons();
+        setListeners();
+
         if(!isInEditMode()) {
             supportMultipleCalls = SipConfigManager.getPreferenceBooleanValue(getContext(), SipConfigManager.SUPPORT_MULTIPLE_CALLS, false);
         }
-        
-        final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                (int) getResources().getDimension(R.dimen.incall_bottom_bar_height));
-        ActionMenuPresenter mActionMenuPresenter = new ActionMenuPresenter(getContext()) {
-            public void bindItemView(MenuItemImpl item, MenuView.ItemView itemView) {
-                super.bindItemView(item, itemView);
-                View actionItemView = (View) itemView;
-                actionItemView.setBackgroundResource(R.drawable.btn_compound_background);
-            }
-        };
-        mActionMenuPresenter.setReserveOverflow(true);
-        // Full width
-        mActionMenuPresenter.setWidthLimit(
-                getContext().getResources().getDisplayMetrics().widthPixels, true);
-        // We use width limit, no need to limit items.
-        mActionMenuPresenter.setItemLimit(20);
-        btnMenuBuilder = new MenuBuilder(getContext());
-        btnMenuBuilder.setCallback(this);
-        MenuInflater inflater = new MenuInflater(getContext());
-        inflater.inflate(R.menu.in_call_controls_menu, btnMenuBuilder);
-        btnMenuBuilder.addMenuPresenter(mActionMenuPresenter);
-        ActionMenuView menuView = (ActionMenuView) mActionMenuPresenter.getMenuView(this);
-        menuView.setBackgroundResource(R.drawable.abs__ab_bottom_transparent_dark_holo);
-        
-        this.addView(menuView, layoutParams);
     }
     
 	@Override
@@ -106,7 +85,93 @@ public class InCallControls extends FrameLayout implements Callback {
 		setEnabledMediaButtons(false);
 	}
 
-	
+    private void initButtons() {
+        speakerButton = (ImageButton) findViewById(R.id.speakerButton);
+        muteButton = (ImageButton) findViewById(R.id.muteButton);
+        bluetoothButton = (ImageButton) findViewById(R.id.bluetoothButton);
+        addCallButton = (ImageButton) findViewById(R.id.addCallButton);
+        mediaSettingsButton = (ImageButton) findViewById(R.id.mediaSettingsButton);
+
+        setBtnCheckedState(speakerButton, false);
+        setBtnCheckedState(muteButton, false);
+        setBtnCheckedState(bluetoothButton, false);
+        setBtnCheckedState(addCallButton, false);
+        setBtnCheckedState(mediaSettingsButton, false);
+    }
+
+    private void setBtnCheckedState(View v, boolean isChecked) {
+        btnStates.put(v.getId(), isChecked);
+    }
+
+    private boolean getBtnCheckedState(View v) {
+        return btnStates.get(v.getId());
+    }
+
+    private void setListeners() {
+        speakerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = !getBtnCheckedState(v);
+                setBtnCheckedState(v, isChecked);
+
+                if (isChecked) {
+                    dispatchTriggerEvent(IOnCallActionTrigger.SPEAKER_ON);
+                    v.setBackgroundColor(BTN_STAT_DEFAULT);
+                }
+                else {
+                    dispatchTriggerEvent(IOnCallActionTrigger.SPEAKER_OFF);
+                    v.setBackgroundColor(Color.TRANSPARENT);
+                }
+            }
+        });
+
+        muteButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = !getBtnCheckedState(v);
+                setBtnCheckedState(v, isChecked);
+
+                if (isChecked) {
+                    dispatchTriggerEvent(IOnCallActionTrigger.MUTE_ON);
+                    v.setBackgroundColor(BTN_STAT_DEFAULT);
+                } else {
+                    dispatchTriggerEvent(IOnCallActionTrigger.MUTE_OFF);
+                    v.setBackgroundColor(Color.TRANSPARENT);
+                }
+            }
+        });
+
+        bluetoothButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = !getBtnCheckedState(v);
+                setBtnCheckedState(v, isChecked);
+
+                if (isChecked) {
+                    dispatchTriggerEvent(IOnCallActionTrigger.BLUETOOTH_ON);
+                    v.setBackgroundColor(BTN_STAT_DEFAULT);
+                }
+                else {
+                    dispatchTriggerEvent(IOnCallActionTrigger.BLUETOOTH_OFF);
+                    v.setBackgroundColor(Color.TRANSPARENT);
+                }
+            }
+        });
+
+        addCallButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTriggerEvent(IOnCallActionTrigger.ADD_CALL);
+            }
+        });
+
+        mediaSettingsButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTriggerEvent(IOnCallActionTrigger.MEDIA_SETTINGS);
+            }
+        });
+    }
 	
 	private boolean callOngoing = false;
 	public void setEnabledMediaButtons(boolean isInCall) {
@@ -169,7 +234,7 @@ public class InCallControls extends FrameLayout implements Callback {
 			onTriggerListener.onTrigger(whichHandle, currentCall);
 		}
 	}
-	
+
 	public void setMediaState(MediaState mediaState) {
 		lastMediaState = mediaState;
 
@@ -179,11 +244,14 @@ public class InCallControls extends FrameLayout implements Callback {
 		if(lastMediaState == null) {
 		    enabled = callOngoing;
 		    checked = false;
-		}else {
+		}
+		else {
     		enabled = callOngoing && lastMediaState.canBluetoothSco;
     		checked = lastMediaState.isBluetoothScoOn;
 		}
-        btnMenuBuilder.findItem(R.id.bluetoothButton).setVisible(enabled).setChecked(checked);
+
+        bluetoothButton.setVisibility(enabled ? VISIBLE : GONE);
+		bluetoothButton.setBackgroundColor(checked ? BTN_STAT_DEFAULT : Color.TRANSPARENT);
         
         // Mic
         if(lastMediaState == null) {
@@ -193,7 +261,9 @@ public class InCallControls extends FrameLayout implements Callback {
             enabled = callOngoing && lastMediaState.canMicrophoneMute;
             checked = lastMediaState.isMicrophoneMute;
         }
-        btnMenuBuilder.findItem(R.id.muteButton).setVisible(enabled).setChecked(checked);
+
+        muteButton.setVisibility(enabled ? VISIBLE : GONE);
+        muteButton.setBackgroundColor(checked ? BTN_STAT_DEFAULT : Color.TRANSPARENT);
         
 
         // Speaker
@@ -206,52 +276,12 @@ public class InCallControls extends FrameLayout implements Callback {
             enabled = callOngoing && lastMediaState.canSpeakerphoneOn;
             checked = lastMediaState.isSpeakerphoneOn;
         }
-        btnMenuBuilder.findItem(R.id.speakerButton).setVisible(enabled).setChecked(checked);
+
+        speakerButton.setVisibility(enabled ? VISIBLE : GONE);
+        speakerButton.setBackgroundColor(checked ? BTN_STAT_DEFAULT : Color.TRANSPARENT);
         
         // Add call
-        btnMenuBuilder.findItem(R.id.addCallButton).setVisible(supportMultipleCalls && callOngoing);
+        addCallButton.setVisibility(supportMultipleCalls && callOngoing ? VISIBLE : GONE);
 	}
-
-    @Override
-    public boolean onMenuItemSelected(MenuBuilder menu, MenuItem item) {
-        int id = item.getItemId();
-        if (item.isCheckable()) {
-            item.setChecked(!item.isChecked());
-        }
-        if (id == R.id.bluetoothButton) {
-            if (item.isChecked()) {
-                dispatchTriggerEvent(IOnCallActionTrigger.BLUETOOTH_ON);
-            } else {
-                dispatchTriggerEvent(IOnCallActionTrigger.BLUETOOTH_OFF);
-            }
-            return true;
-        } else if (id == R.id.speakerButton) {
-            if (item.isChecked()) {
-                dispatchTriggerEvent(IOnCallActionTrigger.SPEAKER_ON);
-            } else {
-                dispatchTriggerEvent(IOnCallActionTrigger.SPEAKER_OFF);
-            }
-            return true;
-        } else if (id == R.id.muteButton) {
-            if (item.isChecked()) {
-                dispatchTriggerEvent(IOnCallActionTrigger.MUTE_ON);
-            } else {
-                dispatchTriggerEvent(IOnCallActionTrigger.MUTE_OFF);
-            }
-            return true;
-        } else if (id == R.id.addCallButton) {
-            dispatchTriggerEvent(IOnCallActionTrigger.ADD_CALL);
-            return true;
-        } else if (id == R.id.mediaSettingsButton) {
-            dispatchTriggerEvent(IOnCallActionTrigger.MEDIA_SETTINGS);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onMenuModeChange(MenuBuilder menu) {
-        // Nothing to do.
-    }
 
 }

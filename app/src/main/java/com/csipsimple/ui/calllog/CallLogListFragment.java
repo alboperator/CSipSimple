@@ -21,31 +21,33 @@
 
 package com.csipsimple.ui.calllog;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.view.ActionMode;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.csipsimple.R;
 import com.csipsimple.api.SipManager;
 import com.csipsimple.api.SipProfile;
@@ -71,7 +73,7 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
     private boolean mDualPane;
 
     private ActionMode mMode;
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -79,8 +81,8 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
     }
 
     private void attachAdapter() {
-        if(getListAdapter() == null) {
-            if(mAdapter == null) {
+        if (getListAdapter() == null) {
+            if (mAdapter == null) {
                 Log.d(THIS_FILE, "Attach call log adapter now");
                 // Adapter
                 mAdapter = new CallLogAdapter(getActivity(), this);
@@ -89,12 +91,12 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
             setListAdapter(mAdapter);
         }
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
         return inflater.inflate(R.layout.call_log_fragment, container, false);
     }
-    
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -114,7 +116,7 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
             lv.setChoiceMode(ListView.CHOICE_MODE_NONE);
             lv.setItemsCanFocus(true);
         }
-        
+
         // Map long press
         lv.setLongClickable(true);
         lv.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -140,13 +142,13 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
     @Override
     public void fetchCalls() {
         attachAdapter();
-        if(isResumed()) {
+        if (isResumed()) {
             getLoaderManager().restartLoader(0, null, this);
         }
     }
 
     boolean alreadyLoaded = false;
-    
+
     @SuppressLint("NewApi")
     @Override
     public void onVisibilityChanged(boolean visible) {
@@ -154,23 +156,23 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
             mShowOptionsMenu = visible;
             // Invalidate the options menu since we are changing the list of
             // options shown in it.
-            SherlockFragmentActivity activity = getSherlockActivity();
+            FragmentActivity activity = getActivity();
             if (activity != null) {
                 activity.invalidateOptionsMenu();
             }
         }
-        
 
-        if(visible) {
+
+        if (visible) {
             attachAdapter();
             // Start loading
-            if(!alreadyLoaded) {
+            if (!alreadyLoaded) {
                 getLoaderManager().initLoader(0, null, this);
                 alreadyLoaded = true;
             }
         }
-        
-        
+
+
         if (visible && isResumed()) {
             //getLoaderManager().restartLoader(0, null, this);
             ListView lv = getListView();
@@ -184,7 +186,7 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    viewDetails(checkedPos, selectedIds);  
+                                    viewDetails(checkedPos, selectedIds);
                                 }
                             });
                         };
@@ -193,9 +195,9 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
                 }
             }
         }
-        
-        
-        if(!visible && mMode != null) {
+
+
+        if (!visible && mMode != null) {
             mMode.finish();
         }
     }
@@ -208,7 +210,7 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
         int actionRoom = getResources().getBoolean(R.bool.menu_in_bar) ? MenuItem.SHOW_AS_ACTION_IF_ROOM : MenuItem.SHOW_AS_ACTION_NEVER;
         MenuItem delMenu = menu.add(R.string.callLog_delete_all);
         delMenu.setIcon(R.drawable.ic_ab_trash_dark).setShowAsAction(actionRoom);
-        delMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+        delMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 deleteAllCalls();
@@ -240,7 +242,7 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
     // Loader
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        return new CursorLoader(getActivity(), SipManager.CALLLOG_URI, new String[] {
+        return new CursorLoader(getActivity(), SipManager.CALLLOG_URI, new String[]{
                 CallLog.Calls._ID, CallLog.Calls.CACHED_NAME, CallLog.Calls.CACHED_NUMBER_LABEL,
                 CallLog.Calls.CACHED_NUMBER_TYPE, CallLog.Calls.DURATION, CallLog.Calls.DATE,
                 CallLog.Calls.NEW, CallLog.Calls.NUMBER, CallLog.Calls.TYPE,
@@ -254,13 +256,13 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
     @Override
     public void viewDetails(int position, long[] callIds) {
         ListView lv = getListView();
-        if(mMode != null) {
+        if (mMode != null) {
             lv.setItemChecked(position, !lv.isItemChecked(position));
             mMode.invalidate();
             // Don't see details in this case
             return;
         }
-        
+
         if (mDualPane) {
             // If we are not currently showing a fragment for the new
             // position, we need to create and install a new one.
@@ -285,12 +287,22 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
 
     @Override
     public void placeCall(String number, Long accId) {
-        if(!TextUtils.isEmpty(number)) {
+        if (!TextUtils.isEmpty(number)) {
             Intent it = new Intent(Intent.ACTION_CALL);
             it.setData(SipUri.forgeSipUri(SipManager.PROTOCOL_CSIP, SipUri.getCanonicalSipContact(number, false)));
             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            if(accId != null) {
+            if (accId != null) {
                 it.putExtra(SipProfile.FIELD_ACC_ID, accId);
+            }
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling : NNNN
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
             }
             getActivity().startActivity(it);
         }
@@ -301,18 +313,19 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
     
     private void turnOnActionMode() {
         Log.d(THIS_FILE, "Long press");
-        mMode = getSherlockActivity().startActionMode(new CallLogActionMode());
+        //mMode = getActivity().startActionMode(new CallLogActionMode());
+
         ListView lv = getListView();
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         
     }
     
-    private class CallLogActionMode  implements ActionMode.Callback {
+    private class CallLogActionMode implements ActionMode.Callback {
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             Log.d(THIS_FILE, "onCreateActionMode");
-            getSherlockActivity().getSupportMenuInflater().inflate(R.menu.call_log_menu, menu);
+            getActivity().getMenuInflater().inflate(R.menu.call_log_menu, menu);
             return true;
         }
 
@@ -360,7 +373,7 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
             }
             mMode = null;
         }
-        
+
     }
     
     private void actionModeDelete() {

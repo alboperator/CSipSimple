@@ -50,11 +50,12 @@ public class CheckableListItemView extends LinearLayout implements Checkable {
 
     @Override
     public void requestLayout() {
-        // We will assume that once measured this will not need to resize
-        // itself, so there is no need to pass the layout request to the parent
-        // view (ListView).
-        forceLayout();
-    }
+		// We will assume that once measured this will not need to resize
+		// itself, so there is no need to pass the layout request to the parent
+		// view (ListView).
+		super.requestLayout();
+		forceLayout();
+	}
 
     
     // Checkable behavior
@@ -71,7 +72,7 @@ public class CheckableListItemView extends LinearLayout implements Checkable {
 			return;
 		}
 		checked = aChecked;
-		setBackgroundResource(checked? R.drawable.abs__list_longpressed_holo : R.drawable.transparent);
+		setBackgroundResource(checked? R.drawable.list_selector_background_pressed : R.drawable.transparent);
 	}
 	
 	@Override

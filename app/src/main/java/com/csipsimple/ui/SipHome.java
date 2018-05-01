@@ -21,6 +21,8 @@
 
 package com.csipsimple.ui;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -39,21 +41,17 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.internal.nineoldandroids.animation.ObjectAnimator;
-import com.actionbarsherlock.internal.nineoldandroids.animation.ValueAnimator;
-import com.actionbarsherlock.internal.widget.IcsLinearLayout;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.R;
 import com.csipsimple.api.SipConfigManager;
 import com.csipsimple.api.SipManager;
@@ -83,7 +81,7 @@ import com.csipsimple.wizards.WizardUtils.WizardInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SipHome extends SherlockFragmentActivity implements OnWarningChanged {
+public class SipHome extends AppCompatActivity implements OnWarningChanged {
     public static final int ACCOUNTS_MENU = Menu.FIRST + 1;
     public static final int PARAMS_MENU = Menu.FIRST + 2;
     public static final int CLOSE_MENU = Menu.FIRST + 3;
@@ -111,7 +109,7 @@ public class SipHome extends SherlockFragmentActivity implements OnWarningChange
     private TabsAdapter mTabsAdapter;
     private boolean mDualPane;
     private Thread asyncSanityChecker;
-    private Tab warningTab;
+    private ActionBar.Tab warningTab;
     private ObjectAnimator warningTabfadeAnim;
 
     /**
@@ -143,19 +141,19 @@ public class SipHome extends SherlockFragmentActivity implements OnWarningChange
 
         
 
-        Tab dialerTab = ab.newTab()
+        ActionBar.Tab dialerTab = ab.newTab()
                  .setContentDescription(R.string.dial_tab_name_text)
                 .setIcon(R.drawable.ic_ab_dialer_holo_dark);
-        Tab callLogTab = ab.newTab()
+        ActionBar.Tab callLogTab = ab.newTab()
                  .setContentDescription(R.string.calllog_tab_name_text)
                 .setIcon(R.drawable.ic_ab_history_holo_dark);
-        Tab favoritesTab = null;
+        ActionBar.Tab favoritesTab = null;
         if(CustomDistribution.supportFavorites()) {
             favoritesTab = ab.newTab()
                     .setContentDescription(R.string.favorites_tab_name_text)
                     .setIcon(R.drawable.ic_ab_favourites_holo_dark);
         }
-        Tab messagingTab = null;
+        ActionBar.Tab messagingTab = null;
         if (CustomDistribution.supportMessaging()) {
             messagingTab = ab.newTab()
                     .setContentDescription(R.string.messages_tab_name_text)
@@ -279,7 +277,7 @@ public class SipHome extends SherlockFragmentActivity implements OnWarningChange
         }
 
         @Override
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
+        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
             clearDetails();
             if (mViewPager.getCurrentItem() != tab.getPosition()) {
                 mViewPager.setCurrentItem(tab.getPosition(), true);
@@ -299,12 +297,12 @@ public class SipHome extends SherlockFragmentActivity implements OnWarningChange
         }
 
         @Override
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
             // Nothing to do
         }
 
         @Override
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
             // Nothing to do
         }
 
@@ -701,7 +699,7 @@ public class SipHome extends SherlockFragmentActivity implements OnWarningChange
             String callAction = intent.getAction();
             if (!TextUtils.isEmpty(callAction)) {
                 ActionBar ab = getSupportActionBar();
-                Tab toSelectTab = null;
+                ActionBar.Tab toSelectTab = null;
                 Integer toSelectId = null;
                 if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_DIALER)
                         || callAction.equalsIgnoreCase(Intent.ACTION_DIAL)

@@ -34,7 +34,7 @@
         android:layout_width="1dip"
         android:layout_height="24dip"
         android:layout_gravity="center_vertical"
-        android:background="@drawable/abs__list_divider_holo_dark" />
+        android:background="@android:drawable/divider_horizontal_bright" />
 
     <ImageButton
         android:id="@+id/dialButton"
@@ -52,7 +52,7 @@
         android:layout_width="1dip"
         android:layout_height="24dip"
         android:layout_gravity="center_vertical"
-        android:background="@drawable/abs__list_divider_holo_dark" />
+        android:background="@android:drawable/divider_horizontal_bright" />
 
     <ImageButton
         android:id="@+id/deleteButton"
@@ -60,7 +60,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_weight="0.30"
-        android:background="?attr/actionBarItemBackground"
+        android:background="@android:color/holo_blue_light"
         android:contentDescription="@string/description_delete_button"
         android:src="@drawable/ic_dial_action_delete"
         android:state_enabled="false" />

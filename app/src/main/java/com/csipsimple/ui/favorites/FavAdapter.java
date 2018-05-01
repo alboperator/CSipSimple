@@ -34,21 +34,17 @@ import android.database.DatabaseUtils;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract.Contacts;
 import android.support.v4.widget.ResourceCursorAdapter;
+import android.support.v7.view.menu.MenuBuilder;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
-import com.actionbarsherlock.internal.view.menu.ActionMenuPresenter;
-import com.actionbarsherlock.internal.view.menu.ActionMenuView;
-import com.actionbarsherlock.internal.view.menu.MenuBuilder;
-import com.actionbarsherlock.internal.view.menu.MenuBuilder.Callback;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.R;
 import com.csipsimple.api.SipManager;
 import com.csipsimple.api.SipProfile;
@@ -68,7 +64,7 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
 
 
     private static final String THIS_FILE = "FavAdapter";
-    
+
 
     /** Listener for the primary action in the list, opens the call details. */
     private final View.OnClickListener mPrimaryActionListener = new View.OnClickListener() {
@@ -87,36 +83,46 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
             List<String> phones = ContactsWrapper.getInstance().getCSipPhonesContact(mContext, ci.contactId);
             boolean useCSip = true;
             String toCall = null;
-            if(phones != null && phones.size() > 0) {
+            if (phones != null && phones.size() > 0) {
                 toCall = phones.get(0);
-            }else {
+            } else {
                 List<Phone> cPhones = ContactsWrapper.getInstance().getPhoneNumbers(mContext, ci.contactId, ContactsWrapper.URI_ALLS);
-                if(cPhones != null && cPhones.size() > 0) {
+                if (cPhones != null && cPhones.size() > 0) {
                     toCall = cPhones.get(0).getNumber();
                     useCSip = false;
                 }
             }
-            
-            if(!TextUtils.isEmpty(toCall) ) {
+
+            if (!TextUtils.isEmpty(toCall)) {
                 Cursor c = (Cursor) getItem((Integer) ci.userData);
                 Long profileId = null;
-                while(c.moveToPrevious()) {
+                while (c.moveToPrevious()) {
                     int cTypeIdx = c.getColumnIndex(ContactsWrapper.FIELD_TYPE);
                     int cAccIdx = c.getColumnIndex(BaseColumns._ID);
-                    if(cTypeIdx >= 0 && cAccIdx >= 0) {
-                        if(c.getInt(cTypeIdx) == ContactsWrapper.TYPE_GROUP) {
+                    if (cTypeIdx >= 0 && cAccIdx >= 0) {
+                        if (c.getInt(cTypeIdx) == ContactsWrapper.TYPE_GROUP) {
                             profileId = c.getLong(cAccIdx);
                             break;
                         }
                     }
                 }
-                
+
                 Intent it = new Intent(Intent.ACTION_CALL);
                 it.setData(SipUri.forgeSipUri(useCSip ? SipManager.PROTOCOL_CSIP : SipManager.PROTOCOL_SIP, toCall));
                 it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                if(profileId != null) {
+                if (profileId != null) {
                     it.putExtra(SipProfile.FIELD_ACC_ID, profileId);
                 }
+//                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+//                    // TODO: Consider Permission CHECK : NNNN
+//                    //    ActivityCompat#requestPermissions
+//                    // here to request the missing permissions, and then overriding
+//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                    //                                          int[] grantResults)
+//                    // to handle the case where the user grants the permission. See the documentation
+//                    // for ActivityCompat#requestPermissions for more details.
+//                    return;
+//                }
                 mContext.startActivity(it);
             }
         }
@@ -130,14 +136,13 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
     public void bindView(View view, final Context context, Cursor cursor) {
         ContentValues cv = new ContentValues();
         DatabaseUtils.cursorRowToContentValues(cursor, cv);
-        
+
         int type = ContactsWrapper.TYPE_CONTACT;
         if(cv.containsKey(ContactsWrapper.FIELD_TYPE)) {
             type = cv.getAsInteger(ContactsWrapper.FIELD_TYPE);
         }
 
         showViewForType(view, type);
-        
         
         if(type == ContactsWrapper.TYPE_GROUP) {
             // Get views
@@ -163,34 +168,71 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
             // Extra menu view if not already set
             ViewGroup menuViewWrapper = (ViewGroup) view.findViewById(R.id.header_cfg_spinner);
             
-            MenuCallback newMcb = new MenuCallback(context, profileId, groupName, domain, publishedEnabled);
-            MenuBuilder menuBuilder;
+            final MenuCallback newMcb = new MenuCallback(context, profileId, groupName, domain, publishedEnabled);
+
+            // // FIXME: Add other list items here (as buttons) : NNNN
+            View menuViewNew = view.findViewById(R.id.sip_options);
+
+            Button btnSetGr = (Button) view.findViewById(R.id.set_group);
+            btnSetGr.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    newMcb.showDialogForGroupSel();
+                }
+            });
+
+            Button btnSetSipData = (Button) view.findViewById(R.id.set_sip_data);
+            btnSetSipData.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    newMcb.showDialogForSipDt();
+                }
+            });
+
+            Button btnSharePresence = (Button) view.findViewById(R.id.share_presence);
+            btnSharePresence.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    newMcb.handlePresence();
+                }
+            });
+            // //
+
+//            MenuBuilder menuBuilder;
             if(menuViewWrapper.getTag() == null) {
+
+                menuViewNew.setVisibility(View.VISIBLE);
 
                 final LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
                         LayoutParams.MATCH_PARENT);
 
-                ActionMenuPresenter mActionMenuPresenter = new ActionMenuPresenter(mContext);
-                mActionMenuPresenter.setReserveOverflow(true);
-                menuBuilder = new MenuBuilder(context);
-                menuBuilder.setCallback(newMcb);
-                MenuInflater inflater = new MenuInflater(context);
-                inflater.inflate(R.menu.fav_menu, menuBuilder);
-                menuBuilder.addMenuPresenter(mActionMenuPresenter);
-                ActionMenuView menuView = (ActionMenuView) mActionMenuPresenter.getMenuView(menuViewWrapper);
-               // UtilityWrapper.getInstance().setBackgroundDrawable(menuView, null);
+//                ActionMenuPresenter mActionMenuPresenter = new ActionMenuPresenter(mContext);
+//                mActionMenuPresenter.setReserveOverflow(true);
+//                menuBuilder = new MenuBuilder(context);
+//                menuBuilder.setCallback(newMcb);
+//                MenuInflater inflater = new MenuInflater(context);
+//                inflater.inflate(R.menu.fav_menu, menuBuilder);
+//                menuBuilder.addMenuPresenter(mActionMenuPresenter);
+//                ActionMenuView menuView = (ActionMenuView) mActionMenuPresenter.getMenuView(menuViewWrapper);
+//                UtilityWrapper.getInstance().setBackgroundDrawable(menuView, null);
                 //change tqc
-                menuView.setBackground(null);
-                menuViewWrapper.addView(menuView, layoutParams);
-                menuViewWrapper.setTag(menuBuilder);
-            }else {
-                menuBuilder = (MenuBuilder) menuViewWrapper.getTag();
-                menuBuilder.setCallback(newMcb);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//                    if(menuView!=null) menuView.setBackground(null);
+//                }
+//                menuViewWrapper.addView(menuView, layoutParams);
+//                menuViewWrapper.setTag(menuBuilder);
             }
-            menuBuilder.findItem(R.id.share_presence).setTitle(publishedEnabled ? R.string.deactivate_presence_sharing : R.string.activate_presence_sharing);
-            menuBuilder.findItem(R.id.set_sip_data).setVisible(!TextUtils.isEmpty(groupName));
-            
-        }else if(type == ContactsWrapper.TYPE_CONTACT) {
+            else {
+//                menuBuilder = (MenuBuilder) menuViewWrapper.getTag();
+//                menuBuilder.setCallback(newMcb);
+            }
+
+//            menuBuilder.findItem(R.id.share_presence).setTitle(publishedEnabled ? R.string.deactivate_presence_sharing : R.string.activate_presence_sharing);
+//            menuBuilder.findItem(R.id.set_sip_data).setVisible(!TextUtils.isEmpty(groupName));
+            btnSharePresence.setText(publishedEnabled ? R.string.deactivate_presence_sharing : R.string.activate_presence_sharing);
+            btnSetSipData.setVisibility(!TextUtils.isEmpty(groupName) ? View.VISIBLE : View.GONE);
+        }
+        else if(type == ContactsWrapper.TYPE_CONTACT) {
             ContactInfo ci = ContactsWrapper.getInstance().getContactInfo(context, cursor);
             ci.userData = cursor.getPosition();
             // Get views
@@ -235,13 +277,12 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
     }
     
     private void showViewForType(View view, int type) {
-        
         view.findViewById(R.id.header_view).setVisibility((type == ContactsWrapper.TYPE_GROUP) ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.contact_view).setVisibility((type == ContactsWrapper.TYPE_CONTACT) ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.configure_view).setVisibility((type == ContactsWrapper.TYPE_CONFIGURE) ? View.VISIBLE : View.GONE);
     }
     
-    private class MenuCallback implements Callback {
+    private class MenuCallback implements MenuBuilder.Callback {
         private Long profileId = SipProfile.INVALID_ID;
         private Context context;
         private String groupName;
@@ -255,6 +296,20 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
             domain = aDomain;
             publishEnabled = aPublishedEnabled;
         }
+
+        public void showDialogForGroupSel() {
+            showDialogForGroupSelection(context, profileId, groupName);
+        }
+
+        public void showDialogForSipDt() {
+            showDialogForSipData(context, profileId, groupName, domain);
+        }
+
+        public void handlePresence() {
+            ContentValues cv = new ContentValues();
+            cv.put(SipProfile.FIELD_PUBLISH_ENABLED, publishEnabled ? 0 : 1);
+            context.getContentResolver().update(ContentUris.withAppendedId(SipProfile.ACCOUNT_ID_URI_BASE, profileId), cv, null, null);
+        }
         
         @Override
         public void onMenuModeChange(MenuBuilder menu) {
@@ -263,19 +318,20 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
         
         @Override
         public boolean onMenuItemSelected(MenuBuilder menu, MenuItem item) {
-            int itemId = item.getItemId();
-            if(itemId == R.id.set_group) {
-                showDialogForGroupSelection(context, profileId, groupName);
-                return true;
-            }else if(itemId == R.id.share_presence) {
-                ContentValues cv = new ContentValues();
-                cv.put(SipProfile.FIELD_PUBLISH_ENABLED, publishEnabled ? 0 : 1);
-                context.getContentResolver().update(ContentUris.withAppendedId(SipProfile.ACCOUNT_ID_URI_BASE, profileId), cv, null, null);
-                return true;
-            }else if(itemId == R.id.set_sip_data) {
-                showDialogForSipData(context, profileId, groupName, domain);
-                return true;
-            }
+            // REMOVE This
+//            int itemId = item.getItemId();
+//            if(itemId == R.id.set_group) {
+//                showDialogForGroupSelection(context, profileId, groupName);
+//                return true;
+//            }else if(itemId == R.id.share_presence) {
+//                ContentValues cv = new ContentValues();
+//                cv.put(SipProfile.FIELD_PUBLISH_ENABLED, publishEnabled ? 0 : 1);
+//                context.getContentResolver().update(ContentUris.withAppendedId(SipProfile.ACCOUNT_ID_URI_BASE, profileId), cv, null, null);
+//                return true;
+//            }else if(itemId == R.id.set_sip_data) {
+//                showDialogForSipData(context, profileId, groupName, domain);
+//                return true;
+//            }
             return false;
         }
     }
@@ -300,6 +356,7 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
                 } while (choiceCursor.moveToNext());
             }
         }
+
         builder.setSingleChoiceItems(choiceCursor, selectedIndex, ContactsWrapper.FIELD_GROUP_NAME, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -389,4 +446,3 @@ public class FavAdapter extends ResourceCursorAdapter implements OnClickListener
         }
     }
 }
-

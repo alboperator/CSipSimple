@@ -3,10 +3,10 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
-    useLibrary  'org.apache.http.legacy' // 需要去除
+    useLibrary  'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.csipsimple"
-        minSdkVersion 8
+        minSdkVersion 14
         targetSdkVersion 25
     }
 
@@ -19,7 +19,6 @@ android {
 }
 
 dependencies {
-    compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
-    compile 'com.android.support:support-v4:21.0.+'
-
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:support-v4:25.0.0'
 }

@@ -27,12 +27,12 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.R;
 import com.csipsimple.api.SipManager;
 import com.csipsimple.api.SipProfile;
@@ -143,8 +143,8 @@ public class BasePrefsWizard extends GenericPrefs {
 		}
 		wizardId = wId;
 		wizard.setParent(this);
-		if(getSupportActionBar() != null) {
-		    getSupportActionBar().setIcon(WizardUtils.getWizardIconRes(wizardId));
+		if(getActionBar() != null) {
+			getActionBar().setIcon(WizardUtils.getWizardIconRes(wizardId));
 		}
 		return true;
 	}

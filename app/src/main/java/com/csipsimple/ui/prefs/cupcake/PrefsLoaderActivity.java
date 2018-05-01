@@ -22,9 +22,8 @@
 package com.csipsimple.ui.prefs.cupcake;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.ui.prefs.GenericPrefs;
 import com.csipsimple.ui.prefs.PrefsLogic;
 import com.csipsimple.utils.Compatibility;
@@ -44,7 +43,7 @@ public class PrefsLoaderActivity extends GenericPrefs {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(PrefsLogic.getTitleResourceForType(getPreferenceType()));
-        ActionBar ab = getSupportActionBar();
+        android.app.ActionBar ab = getActionBar();
         if(ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
@@ -73,6 +72,4 @@ public class PrefsLoaderActivity extends GenericPrefs {
         PrefsLogic.updateDescriptionForType(this, this, getPreferenceType());
     }
 
-
-    
 }

@@ -22,7 +22,7 @@
         <item name="android:layout_height">68dip</item>
     </style>
 
-    <style name="TextAppearance.SlidingTabNormal" parent="@android:attr/textAppearanceMedium">
+    <style name="TextAppearance.SlidingTabNormal" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">?android:attr/textColorTertiary</item>
         <item name="android:textSize">28sp</item>
         <item name="android:shadowDx">0.0</item>
@@ -31,7 +31,7 @@
         <item name="android:shadowColor">@android:color/black</item>
     </style>
 
-    <style name="TextAppearance.SlidingTabActive" parent="@android:attr/textAppearanceMedium">
+    <style name="TextAppearance.SlidingTabActive" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">28sp</item>
     </style>
@@ -42,7 +42,8 @@
         <item name="android:layout_width">0dip</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:background">?attr/actionBarItemBackground</item>
+        <!--<item name="android:background">?attr/actionBarItemBackground</item>-->
+        <item name="android:background">@android:color/holo_blue_bright</item>
     </style>
 
     <style name="DialtactsDigitsTextAppearance">
@@ -74,12 +75,13 @@
         <item name="android:layout_margin">5dp</item>
     </style>
 
-    <style name="DarkTheme" parent="Theme.Sherlock"></style>
+    <style name="DarkTheme" parent="android:Theme.DeviceDefault"/>
+    <style name="CompatTheme" parent="Theme.AppCompat"/>
 
-    <style name="DarkTheme.Dialog" parent="Theme.Sherlock.Light.DarkActionBar">
+    <style name="DarkTheme.Dialog" parent="android:Theme.Holo.Light.DarkActionBar">
 
         <!-- TODO : use android:attr on 11 -->
-        <item name="actionBarItemBackground">@drawable/abs__item_background_holo_dark</item>
+        <item name="actionBarItemBackground">@android:style/TextAppearance.Medium</item>
         <!--
         <item name="android:windowNoTitle">false</item>
         <item name="android:windowAnimationStyle">@null</item>
@@ -87,8 +89,8 @@
         -->
     </style>
 
-    <style name="DarkTheme.NoTitle" parent="Theme.Sherlock.NoActionBar">
-        <item name="actionBarItemBackground">@drawable/abs__item_background_holo_dark</item>
+    <style name="DarkTheme.NoTitle" parent="android:Theme.Black.NoTitleBar">
+        <item name="actionBarItemBackground">@android:style/TextAppearance.Medium</item>
     </style>
 
     <!-- Notification -->

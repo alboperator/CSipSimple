@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageButton
+        android:id="@+id/dtmfCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/send_dtmf"
+        android:src="@drawable/ic_ab_dialpad" />
+
+    <!--<item-->
+    <!--android:id="@+id/dtmfCallButton"-->
+    <!--android:icon="@drawable/ic_ab_dialpad"-->
+    <!--android:showAsAction="ifRoom"-->
+    <!--android:title="@string/send_dtmf"/>-->
+
+
+    <ImageButton
+        android:id="@+id/videoCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/video"
+        android:src="@drawable/ic_prefs_media_video" />
+
+    <!--<item-->
+    <!--android:id="@+id/videoCallButton"-->
+    <!--android:icon="@drawable/ic_prefs_media_video"-->
+    <!--android:showAsAction="ifRoom"-->
+    <!--android:title="@string/video"/>-->
+
+
+    <ImageButton
+        android:id="@+id/detailedDisplayCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/info"
+        android:src="@android:drawable/ic_menu_info_details" />
+
+    <!--<item-->
+    <!--android:id="@+id/detailedDisplayCallButton"-->
+    <!--android:icon="@android:drawable/ic_menu_info_details"-->
+    <!--android:showAsAction="ifRoom"-->
+    <!--android:title="@string/info"/>    -->
+
+
+    <ImageButton
+        android:id="@+id/takeCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/take_call"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/takeCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/take_call"/>-->
+
+
+    <ImageButton
+        android:id="@+id/declineCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/reject_call"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/declineCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/reject_call"/>-->
+
+
+    <ImageButton
+        android:id="@+id/dontTakeCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/ignore_call"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/dontTakeCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/ignore_call"/>-->
+
+    <ImageButton
+        android:id="@+id/terminateCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/clear_call"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/terminateCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/clear_call"/>-->
+
+
+    <ImageButton
+        android:id="@+id/xferCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/xfer_uri"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/xferCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/xfer_uri"/>-->
+
+
+    <ImageButton
+        android:id="@+id/transferCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/transfer_to_call"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/transferCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/transfer_to_call"/>-->
+
+
+    <ImageButton
+        android:id="@+id/holdCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/hold_call"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+    <!--<item-->
+    <!--android:id="@+id/holdCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/hold_call"/>-->
+
+
+    <ImageButton
+        android:id="@+id/recordCallButton"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/record"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/recordCallButton"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/record"/>-->
+
+
+    <ImageButton
+        android:id="@+id/zrtpAcceptance"
+        style="?attr/actionButtonStyle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/zrtp_trust_remote"
+        android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+    <!--<item-->
+    <!--android:id="@+id/zrtpAcceptance"-->
+    <!--android:showAsAction="never"-->
+    <!--android:title="@string/zrtp_trust_remote"/>-->
+
+</LinearLayout>
+
+

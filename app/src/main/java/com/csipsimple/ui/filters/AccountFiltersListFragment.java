@@ -38,6 +38,9 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -46,9 +49,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.R;
 import com.csipsimple.api.SipManager;
 import com.csipsimple.api.SipProfile;
@@ -60,7 +60,7 @@ import com.csipsimple.widgets.DragnDropListView.DropListener;
 import java.util.ArrayList;
 
 public class AccountFiltersListFragment extends CSSListFragment {
-    private static final String THIS_FILE = "AccountFiltersListFragment";
+    private static final String THIS_FILE = "AccountFiltersListFrag";
 
     private boolean dualPane;
 	private Long curCheckFilterId = SipProfile.INVALID_ID;
@@ -384,6 +384,5 @@ public class AccountFiltersListFragment extends CSSListFragment {
             mAdapter.changeCursor(c);
         }
     }
-	
-	
+
 }

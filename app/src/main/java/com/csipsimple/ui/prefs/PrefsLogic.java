@@ -26,9 +26,9 @@ import android.content.Intent;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.telephony.TelephonyManager;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.R;
 import com.csipsimple.api.SipConfigManager;
 import com.csipsimple.api.SipManager;
@@ -233,7 +233,6 @@ public class PrefsLogic {
                     pfh.hidePreference("for_incoming", SipConfigManager.USE_EDGE_IN);
                     pfh.hidePreference("for_outgoing", SipConfigManager.USE_EDGE_OUT);
                 }
-                
 
                 if(!Compatibility.isCompatible(9)) {
                     pfh.hidePreference(NWK_PERFS_KEY, SipConfigManager.LOCK_WIFI_PERFS);

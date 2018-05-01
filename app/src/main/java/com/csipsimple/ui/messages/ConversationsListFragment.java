@@ -36,6 +36,9 @@ import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,10 +46,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.csipsimple.R;
 import com.csipsimple.api.SipMessage;
 import com.csipsimple.service.SipNotifications;
@@ -197,7 +196,7 @@ public class ConversationsListFragment extends CSSListFragment implements ViewPa
         
         MenuItem writeMenu = menu.add(R.string.menu_compose_new);
         writeMenu.setIcon(R.drawable.ic_menu_msg_compose_holo_dark).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        writeMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+        writeMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 onClickAddMessage();
@@ -209,7 +208,7 @@ public class ConversationsListFragment extends CSSListFragment implements ViewPa
 
             MenuItem deleteAllMenu = menu.add(R.string.menu_delete_all);
             deleteAllMenu.setIcon(android.R.drawable.ic_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-            deleteAllMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+            deleteAllMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     confirmDeleteThread(null);
@@ -389,6 +388,5 @@ public class ConversationsListFragment extends CSSListFragment implements ViewPa
             mAdapter.changeCursor(c);
         }
     }
-	
-    
+
 }

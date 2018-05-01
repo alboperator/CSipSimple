@@ -23,8 +23,8 @@ package com.csipsimple.ui.prefs;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.csipsimple.api.SipProfile;
 import com.csipsimple.ui.account.AccountsChooserListActivity;
 import com.csipsimple.ui.filters.AccountFilters;
@@ -37,8 +37,7 @@ public class PrefsFilters extends AccountsChooserListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        getSherlock().getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
     
 	@Override
@@ -56,7 +55,6 @@ public class PrefsFilters extends AccountsChooserListActivity {
             startActivity(it);
         }
     }
-    
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

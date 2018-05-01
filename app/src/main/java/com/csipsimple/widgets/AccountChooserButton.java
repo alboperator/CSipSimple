@@ -21,28 +21,26 @@
 
 package com.csipsimple.widgets;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
+import android.support.v7.view.menu.MenuBuilder;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.internal.view.View_HasStateListenerSupport;
-import com.actionbarsherlock.internal.view.View_OnAttachStateChangeListener;
-import com.actionbarsherlock.internal.view.menu.MenuBuilder;
-import com.actionbarsherlock.internal.view.menu.MenuPopupHelper;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.csipsimple.R;
 import com.csipsimple.api.SipProfile;
 import com.csipsimple.utils.AccountListUtils;
@@ -53,9 +51,11 @@ import com.csipsimple.utils.Compatibility;
 import com.csipsimple.utils.Log;
 import com.csipsimple.wizards.WizardUtils;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class AccountChooserButton extends LinearLayout implements OnClickListener, View_HasStateListenerSupport {
 
@@ -77,9 +77,7 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
     private Long targetAccountId = null;
 
     private boolean showExternals = true;
-    
     private final ComponentName telCmp;
-
     private OnAccountChangeListener onAccountChange = null;
 
     /**
@@ -90,7 +88,7 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
 
         /**
          * Called when the user make an action
-         * 
+         *
          * @param keyCode keyCode pressed
          * @param dialTone corresponding dialtone
          */
@@ -108,7 +106,7 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
         // UI management
         setClickable(true);
         setFocusable(true);
-        setBackgroundResource(R.drawable.abs__spinner_ab_holo_dark);
+        setBackgroundResource(R.drawable.ic_ab_dialer_holo_dark);
         setOrientation(VERTICAL);
         setPadding(6, 0, 6, 0);
         setGravity(Gravity.CENTER);
@@ -120,7 +118,15 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
         imageView = (ImageView) findViewById(R.id.quickaction_icon);
 
         mMenuBuilder = new MenuBuilder(getContext());
-        
+
+        accountItems = new TreeMap<Long, SipProfile>(
+                new Comparator<Long>() {
+                    @Override
+                    public int compare(Long o1, Long o2) {
+                        return o1.compareTo(o2);
+                    }
+                });
+
         // Init accounts
         setAccount(null);
     }
@@ -133,8 +139,10 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
     private AccountStatusContentObserver statusObserver = null;
     private boolean canChangeIfValid = true;
 
-    private MenuPopupHelper mPopupMenu;
+//    private MenuPopupHelper mPopupMenu;
     private MenuBuilder mMenuBuilder;
+    private TreeMap<Long, SipProfile> accountItems;
+
     private final Set<View_OnAttachStateChangeListener> mListeners = new HashSet<View_OnAttachStateChangeListener>();
 
     /**
@@ -204,22 +212,27 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
 
     @Override
     public void onClick(View v) {
+
         Log.d(THIS_FILE, "Click the account chooser button");
 
-        if(mPopupMenu == null) {
-            mPopupMenu = new MenuPopupHelper(getContext(), mMenuBuilder, this, false);
-            mPopupMenu.setForceShowIcon(true);
-        }
-        mMenuBuilder.removeGroup(R.id.menu_accbtn_accounts);
+//        if(mPopupMenu == null) {
+////            mPopupMenu = new MenuPopupHelper(getContext(), mMenuBuilder, this, false);
+//            mPopupMenu = new MenuPopupHelper(getContext(), mMenuBuilder);
+//            mPopupMenu.setForceShowIcon(true);
+//        }
+//        mMenuBuilder.removeGroup(R.id.menu_accbtn_accounts);
 
         Cursor c = getContext().getContentResolver().query(SipProfile.ACCOUNT_URI, ACC_PROJECTION, SipProfile.FIELD_ACTIVE + "=?", new String[] {
                 "1"
         }, null);
-        
+
         boolean hasSomeSip = false;
+        long cntAccounts = 0L;
+
         if (c != null) {
             try {
                 if (c.moveToFirst()) {
+
                     do {
                         final SipProfile account = new SipProfile(c);
                         AccountStatusDisplay accountStatusDisplay = AccountListUtils
@@ -228,10 +241,11 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
                             BitmapDrawable drawable = new BitmapDrawable(getResources(), 
                                     WizardUtils.getWizardBitmap(getContext(), account));
                             
-                            MenuItem item = mMenuBuilder.add(R.id.menu_accbtn_accounts, MenuBuilder.NONE, MenuBuilder.NONE, account.display_name);
-                            item.setIcon(drawable);
-                            item.setOnMenuItemClickListener(new OnAccountMenuItemListener(account));
-                            
+                            //MenuItem item = mMenuBuilder.add(R.id.menu_accbtn_accounts, MenuBuilder.NONE, MenuBuilder.NONE, account.display_name);
+                            //item.setIcon(drawable);
+                            //item.setOnMenuItemClickListener(new OnAccountMenuItemListener(account));
+                            accountItems.put(cntAccounts++, account);
+
                             hasSomeSip = true;
                         }
                     } while (c.moveToNext());
@@ -242,15 +256,24 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
                 c.close();
             }
         }
+
         if(!hasSomeSip) {
-            MenuItem item = mMenuBuilder.add(R.id.menu_accbtn_accounts, MenuBuilder.NONE, MenuBuilder.NONE, R.string.acct_inactive);
-            item.setIcon(android.R.drawable.ic_dialog_alert);
+
+//            MenuItem item = mMenuBuilder.add(R.id.menu_accbtn_accounts, MenuBuilder.NONE, MenuBuilder.NONE, R.string.acct_inactive);
+//            item.setIcon(android.R.drawable.ic_dialog_alert);
+
+            final SipProfile emptyAccount = new SipProfile();
+            emptyAccount.display_name = getResources().getString(R.string.acct_inactive);
+            emptyAccount.id = 0;        // android.R.drawable.ic_dialog_alert
+
+            accountItems.put(cntAccounts, emptyAccount);
         }
 
         if (showExternals) {
             // Add external rows
             Map<String, String> callHandlers = CallHandlerPlugin.getAvailableCallHandlers(getContext());
-            boolean includeGsm = Compatibility.canMakeGSMCall(getContext()); 
+            boolean includeGsm = Compatibility.canMakeGSMCall(getContext());
+
             for (String packageName : callHandlers.keySet()) {
                 Log.d(THIS_FILE, "Compare "+packageName+" to "+telCmp.flattenToString());
                 // We ensure that GSM integration is not prevented
@@ -263,9 +286,10 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
             }
         }
 
-        mPopupMenu.show();
+        //mPopupMenu.show();
+        accountChooserDialog(getContext(), accountItems);
     }
-    
+
     private class OnPluginLoadListener implements OnLoadListener {
         @Override
         public void onLoad(CallHandlerPlugin ch) {
@@ -284,9 +308,11 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
 
         @Override
         public void run() {
-            MenuItem item = mMenuBuilder.add(R.id.menu_accbtn_accounts, Menu.NONE, Menu.NONE,  ch.getLabel().toString());
-            item.setIcon(ch.getIconDrawable());
-            item.setOnMenuItemClickListener(new OnAccountMenuItemListener(ch.getFakeProfile()));
+//            MenuItem item = mMenuBuilder.add(R.id.menu_accbtn_accounts, Menu.NONE, Menu.NONE,  ch.getLabel().toString());
+//            item.setIcon(ch.getIconDrawable());
+//            item.setOnMenuItemClickListener(new OnAccountMenuItemListener(ch.getFakeProfile()));
+
+            accountItems.put((long) accountItems.size(), ch.getFakeProfile());
         }
     }
 
@@ -303,19 +329,21 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
             if(isInEditMode() || Compatibility.canMakeGSMCall(getContext())) {
                 textView.setText(getResources().getString(R.string.gsm));
                 imageView.setImageResource(R.drawable.ic_wizard_gsm);
-            }else {
+            }
+            else {
                 textView.setText(getResources().getString(R.string.acct_inactive));
                 imageView.setImageResource(android.R.drawable.ic_dialog_alert);
             }
-        } else {
+        }
+        else {
             textView.setText(account.display_name);
             imageView.setImageDrawable(new BitmapDrawable(getResources(), WizardUtils.getWizardBitmap(getContext(),
                     account)));
         }
+
         if (onAccountChange != null) {
             onAccountChange.onChooseAccount(account);
         }
-
     }
 
     /**
@@ -352,7 +380,8 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
                                         toSelectAcc = acc;
                                         break;
                                     }
-                                }else {
+                                }
+                                else {
                                     // Select first
                                     toSelectAcc = acc;
                                     break;
@@ -453,7 +482,7 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
     }
     
     
-    private class OnAccountMenuItemListener implements OnMenuItemClickListener {
+    private class OnAccountMenuItemListener implements MenuItem.OnMenuItemClickListener {
         private SipProfile mAccount;
         OnAccountMenuItemListener(SipProfile account){
             mAccount = account;
@@ -469,7 +498,40 @@ public class AccountChooserButton extends LinearLayout implements OnClickListene
     }
     
     public MenuItem addExtraMenuItem(int titleRes) {
+        // FIXME, NNNN: Handle extras: 'rewrite rule'
         return mMenuBuilder.add(R.id.menu_accbtn_extras, MenuBuilder.NONE, 100, titleRes);
+    }
+
+    private void accountChooserDialog(final Context context, final TreeMap<Long, SipProfile> accountItems) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle(R.string.choose_account);
+        builder.setCancelable(true);
+
+        DialogInterface.OnClickListener dIf = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SipProfile account = accountItems.get((long) which);
+                AccountStatusDisplay accountStatusDisplay = AccountListUtils
+                        .getAccountDisplay(getContext(), account.id);
+
+                if (accountStatusDisplay.availableForCalls) {
+                    setAccount(account);
+                }
+            }
+        };
+
+        CharSequence[] itemsCS = new CharSequence[accountItems.size()];
+        int cnt = 0;
+
+        for(SipProfile sProfile : accountItems.values()) {
+            itemsCS[cnt++] = sProfile.display_name;
+        }
+
+        builder.setItems(itemsCS, dIf);
+
+        final Dialog dialog = builder.create();
+        dialog.show();
     }
 
 }

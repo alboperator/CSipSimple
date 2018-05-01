@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!--android:id="@+id/inner_card_menu"-->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">  <!-- wrap_content -->
+
+        <ImageButton
+            android:id="@+id/speakerButton"
+            style="?attr/actionButtonStyle"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/speaker"
+            android:src="@drawable/ic_sound_speakerphone_holo_dark" />
+
+        <ImageButton
+            android:id="@+id/muteButton"
+            style="?attr/actionButtonStyle"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/mute"
+            android:src="@drawable/ic_mute_holo_dark" />
+
+        <ImageButton
+            android:id="@+id/bluetoothButton"
+            style="?attr/actionButtonStyle"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/bluetooth"
+            android:src="@drawable/ic_sound_bluetooth_holo_dark" />
+
+        <ImageButton
+            android:id="@+id/addCallButton"
+            style="?attr/actionButtonStyle"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/add_call"
+            android:src="@android:drawable/ic_menu_add" />
+
+        <ImageButton
+            android:id="@+id/mediaSettingsButton"
+            style="?attr/actionButtonStyle"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/prefs_media"
+            android:src="@android:drawable/ic_menu_preferences" />
+
+    </LinearLayout>
+</FrameLayout>

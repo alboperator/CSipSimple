@@ -122,11 +122,47 @@
             android:src="@drawable/ic_ab_dialer_holo_dark" />
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/configure_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/configure" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/configure_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/configure" />
+
+        <LinearLayout
+            android:id="@+id/sip_options"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Menu items, transformed as buttons -->
+            <Button
+                android:id="@+id/set_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/set_android_group" />
+
+            <Button
+                android:id="@+id/set_sip_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/set_sip_data" />
+
+            <Button
+                android:id="@+id/share_presence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/activate_presence_sharing" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

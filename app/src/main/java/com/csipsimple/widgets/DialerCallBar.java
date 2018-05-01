@@ -120,7 +120,7 @@ public class DialerCallBar extends LinearLayout implements OnClickListener, OnLo
             if (viewId == R.id.dialVideoButton) {
                 actionListener.placeVideoCall();
             }else if(viewId == R.id.dialButton) {
-                actionListener.placeCall();
+                actionListener.placeCall();         // fixme, NNNN: crash, if no permission: NNNN
             }else if(viewId == R.id.deleteButton) {
                 actionListener.deleteChar();
             }
