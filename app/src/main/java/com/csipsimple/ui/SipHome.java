@@ -35,14 +35,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +56,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.csipsimple.R;
 import com.csipsimple.api.SipConfigManager;
@@ -81,7 +87,9 @@ import com.csipsimple.wizards.WizardUtils.WizardInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SipHome extends AppCompatActivity implements OnWarningChanged {
+public class SipHome extends AppCompatActivity implements OnWarningChanged
+//        , NavigationView.OnNavigationItemSelectedListener
+{
     public static final int ACCOUNTS_MENU = Menu.FIRST + 1;
     public static final int PARAMS_MENU = Menu.FIRST + 2;
     public static final int CLOSE_MENU = Menu.FIRST + 3;
@@ -112,6 +120,20 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged {
     private ActionBar.Tab warningTab;
     private ObjectAnimator warningTabfadeAnim;
 
+    private DrawerLayout mDrawerLayout;
+
+//    @Override
+//    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.home) {
+//            Toast.makeText(this, "Test...", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        return true;
+//    }
+
     /**
      * Listener interface for Fragments accommodated in {@link ViewPager}
      * enabling them to know when it becomes visible or invisible inside the
@@ -131,11 +153,24 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged {
 
         setContentView(R.layout.sip_home);
 
+        //
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+        //
+
         final ActionBar ab = getSupportActionBar();
         ab.setDisplayShowHomeEnabled(false);
         ab.setDisplayShowTitleEnabled(false);
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         // ab.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+        // // // //
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeAsUpIndicator(R.mipmap.ic_drawer_icon);
+
+//        ActionBar actionbar = getSupportActionBar();
+//        actionbar.setDisplayHomeAsUpEnabled(true);
+        // // // //
 
         // showAbTitle = Compatibility.hasPermanentMenuKey
 
@@ -197,7 +232,75 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged {
             };
         };
         asyncSanityChecker.start();
-        
+
+        // // //
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(false);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+                        if (id == R.id.nav_settings) {
+                            startActivityForResult(new Intent(SipManager.ACTION_UI_PREFS_GLOBAL), CHANGE_PREFS);
+                            return true;
+                        }
+                        else if(id == R.id.nav_account) {
+                            startActivity(new Intent(SipHome.this, AccountsEditList.class));
+                            return true;
+                        }
+                        else if(id == R.id.nav_logout) {
+                            Log.d(THIS_FILE, "CLOSE");
+                            boolean currentlyActiveForIncoming = prefProviderWrapper.isValidConnectionForIncoming();
+                            boolean futureActiveForIncoming = (prefProviderWrapper.getAllIncomingNetworks().size() > 0);
+                            if (currentlyActiveForIncoming || futureActiveForIncoming) {
+                                // Alert user that we will disable for all incoming calls as
+                                // he want to quit
+                                new AlertDialog.Builder(SipHome.this)
+                                        .setTitle(R.string.warning)
+                                        .setMessage(
+                                                getString(currentlyActiveForIncoming ? R.string.disconnect_and_incoming_explaination
+                                                        : R.string.disconnect_and_future_incoming_explaination))
+                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                prefProviderWrapper.setPreferenceBooleanValue(PreferencesWrapper.HAS_BEEN_QUIT, true);
+                                                disconnect(true);
+                                            }
+                                        })
+                                        .setNegativeButton(R.string.cancel, null)
+                                        .show();
+                            } else {
+                                disconnect(true);
+                            }
+                            return true;
+                        }
+                        else if(id == R.id.nav_help) {
+                            // Create the fragment and show it as a dialog.
+                            DialogFragment newFragment = Help.newInstance();
+                            newFragment.show(getSupportFragmentManager(), "dialog");
+                            return true;
+                        }
+
+                        return true;
+                    }
+                });
+
+        // //
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+
+//        ActionBar actionbar = getSupportActionBar();
+//        actionbar.setDisplayHomeAsUpEnabled(true);
+//        actionbar.setHomeAsUpIndicator(R.drawable.ic_indicator_on);
     }
 
     /**
@@ -798,6 +901,11 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+//            case R.id.home:
+//                Toast.makeText(this, "This is HOME.", Toast.LENGTH_SHORT).show();
+//                mDrawerLayout.openDrawer(GravityCompat.START);
+//                return true;
+
             case ACCOUNTS_MENU:
                 startActivity(new Intent(this, AccountsEditList.class));
                 return true;
@@ -886,7 +994,7 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged {
             finish();
         }
     }
-    
+
     
     
     

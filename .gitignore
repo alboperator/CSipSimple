@@ -17,3 +17,5 @@ app/src/main/jni.*
 .idea/
 .gradle/
 
+app/app.iml
+

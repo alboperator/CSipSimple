@@ -116,4 +116,9 @@
     <string name="uri_sip">Internet call</string>
     <string name="choose_account">Choose account</string>
 
+    <string name="nav_settings">Settings</string>
+    <string name="nav_accounts">Accounts</string>
+    <string name="nav_logout">Logout</string>
+    <string name="nav_help">Help</string>
+
 </resources>
