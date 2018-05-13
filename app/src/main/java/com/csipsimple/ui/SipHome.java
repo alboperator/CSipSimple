@@ -22,41 +22,31 @@
 package com.csipsimple.ui;
 
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.csipsimple.R;
 import com.csipsimple.api.SipConfigManager;
@@ -78,8 +68,6 @@ import com.csipsimple.utils.NightlyUpdater;
 import com.csipsimple.utils.NightlyUpdater.UpdaterPopupLauncher;
 import com.csipsimple.utils.PreferencesProviderWrapper;
 import com.csipsimple.utils.PreferencesWrapper;
-import com.csipsimple.utils.Theme;
-import com.csipsimple.utils.UriUtils;
 import com.csipsimple.utils.backup.BackupWrapper;
 import com.csipsimple.wizards.BasePrefsWizard;
 import com.csipsimple.wizards.WizardUtils.WizardInfo;
@@ -88,14 +76,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SipHome extends AppCompatActivity implements OnWarningChanged
-//        , NavigationView.OnNavigationItemSelectedListener
 {
     public static final int ACCOUNTS_MENU = Menu.FIRST + 1;
     public static final int PARAMS_MENU = Menu.FIRST + 2;
     public static final int CLOSE_MENU = Menu.FIRST + 3;
     public static final int HELP_MENU = Menu.FIRST + 4;
     public static final int DISTRIB_ACCOUNT_MENU = Menu.FIRST + 5;
-
 
     private static final String THIS_FILE = "SIP_HOME";
 
@@ -114,25 +100,17 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
     private boolean hasTriedOnceActivateAcc = false;
     // private ImageButton pickupContact;
     private ViewPager mViewPager;
-    private TabsAdapter mTabsAdapter;
-    private boolean mDualPane;
+//    private TabsAdapter mTabsAdapter;
+//    private boolean mDualPane;
     private Thread asyncSanityChecker;
-    private ActionBar.Tab warningTab;
+//    private ActionBar.Tab warningTab;
     private ObjectAnimator warningTabfadeAnim;
 
     private DrawerLayout mDrawerLayout;
 
-//    @Override
-//    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.home) {
-//            Toast.makeText(this, "Test...", Toast.LENGTH_SHORT).show();
-//        }
-//
-//        return true;
-//    }
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     /**
      * Listener interface for Fragments accommodated in {@link ViewPager}
@@ -145,75 +123,74 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        //prefWrapper = new PreferencesWrapper(this);
-        prefProviderWrapper = new PreferencesProviderWrapper(this);
-
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.sip_home);
 
-        //
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-        //
+        prefProviderWrapper = new PreferencesProviderWrapper(this);
 
-        final ActionBar ab = getSupportActionBar();
-        ab.setDisplayShowHomeEnabled(false);
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//        final ActionBar ab = getSupportActionBar();
+        //ab.setDisplayShowHomeEnabled(false);
+//        ab.setDisplayShowTitleEnabled(false);
+//        ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         // ab.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         // // // //
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeAsUpIndicator(R.mipmap.ic_drawer_icon);
+//        ab.setDisplayHomeAsUpEnabled(true);
+//        ab.setHomeAsUpIndicator(R.mipmap.ic_drawer_icon);
 
 //        ActionBar actionbar = getSupportActionBar();
 //        actionbar.setDisplayHomeAsUpEnabled(true);
         // // // //
 
-        // showAbTitle = Compatibility.hasPermanentMenuKey
+        // //
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
 
-        ActionBar.Tab dialerTab = ab.newTab()
-                 .setContentDescription(R.string.dial_tab_name_text)
-                .setIcon(R.drawable.ic_ab_dialer_holo_dark);
-        ActionBar.Tab callLogTab = ab.newTab()
-                 .setContentDescription(R.string.calllog_tab_name_text)
-                .setIcon(R.drawable.ic_ab_history_holo_dark);
-        ActionBar.Tab favoritesTab = null;
-        if(CustomDistribution.supportFavorites()) {
-            favoritesTab = ab.newTab()
-                    .setContentDescription(R.string.favorites_tab_name_text)
-                    .setIcon(R.drawable.ic_ab_favourites_holo_dark);
-        }
-        ActionBar.Tab messagingTab = null;
-        if (CustomDistribution.supportMessaging()) {
-            messagingTab = ab.newTab()
-                    .setContentDescription(R.string.messages_tab_name_text)
-                    .setIcon(R.drawable.ic_ab_text_holo_dark);
-        }
-        
-        warningTab = ab.newTab().setIcon(android.R.drawable.ic_dialog_alert);
-        warningTabfadeAnim = ObjectAnimator.ofInt(warningTab.getIcon(), "alpha", 255, 100);
-        warningTabfadeAnim.setDuration(1500);
-        warningTabfadeAnim.setRepeatCount(ValueAnimator.INFINITE);
-        warningTabfadeAnim.setRepeatMode(ValueAnimator.REVERSE);
-        
-        mDualPane = getResources().getBoolean(R.bool.use_dual_panes);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        // //
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mTabsAdapter = new TabsAdapter(this, getSupportActionBar(), mViewPager);
-        mTabsAdapter.addTab(dialerTab, DialerFragment.class, TAB_ID_DIALER);
-        mTabsAdapter.addTab(callLogTab, CallLogListFragment.class, TAB_ID_CALL_LOG);
-        if(favoritesTab != null) {
-            mTabsAdapter.addTab(favoritesTab, FavListFragment.class, TAB_ID_FAVORITES);
-        }
-        if (messagingTab != null) {
-            mTabsAdapter.addTab(messagingTab, ConversationsListFragment.class, TAB_ID_MESSAGES);
-        }
+//        ActionBar.Tab dialerTab = ab.newTab()
+//                 .setContentDescription(R.string.dial_tab_name_text)
+//                .setIcon(R.drawable.ic_ab_dialer_holo_dark);
+//        ActionBar.Tab callLogTab = ab.newTab()
+//                 .setContentDescription(R.string.calllog_tab_name_text)
+//                .setIcon(R.drawable.ic_ab_history_holo_dark);
+        //ActionBar.Tab favoritesTab = null;
+//        if(CustomDistribution.supportFavorites()) {
+//            favoritesTab = ab.newTab()
+//                    .setContentDescription(R.string.favorites_tab_name_text)
+//                    .setIcon(R.drawable.ic_ab_favourites_holo_dark);
+//        }
+//        ActionBar.Tab messagingTab = null;
+//        if (CustomDistribution.supportMessaging()) {
+//            messagingTab = ab.newTab()
+//                    .setContentDescription(R.string.messages_tab_name_text)
+//                    .setIcon(R.drawable.ic_ab_text_holo_dark);
+//        }
         
+//        warningTab = ab.newTab().setIcon(android.R.drawable.ic_dialog_alert);
+//        warningTabfadeAnim = ObjectAnimator.ofInt(warningTab.getIcon(), "alpha", 255, 100);
+//        warningTabfadeAnim.setDuration(1500);
+//        warningTabfadeAnim.setRepeatCount(ValueAnimator.INFINITE);
+//        warningTabfadeAnim.setRepeatMode(ValueAnimator.REVERSE);
+        
+//        mDualPane = getResources().getBoolean(R.bool.use_dual_panes);
+
+//        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+//        mTabsAdapter = new TabsAdapter(this, getSupportActionBar(), mViewPager);
+        //mTabsAdapter.addTab(dialerTab, DialerFragment.class, TAB_ID_DIALER);
+        //mTabsAdapter.addTab(callLogTab, CallLogListFragment.class, TAB_ID_CALL_LOG);
+//        if(favoritesTab != null) {
+//            mTabsAdapter.addTab(favoritesTab, FavListFragment.class, TAB_ID_FAVORITES);
+//        }
+//        if (messagingTab != null) {
+//            mTabsAdapter.addTab(messagingTab, ConversationsListFragment.class, TAB_ID_MESSAGES);
+//        }
 
         hasTriedOnceActivateAcc = false;
 
@@ -221,9 +198,8 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
 
-        selectTabWithAction(getIntent());
+//        selectTabWithAction(getIntent());
         Log.setLogLevel(prefProviderWrapper.getLogLevel());
-        
 
         // Async check
         asyncSanityChecker = new Thread() {
@@ -235,6 +211,14 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
 
         // // //
         mDrawerLayout = findViewById(R.id.drawer_layout);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        mDrawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        //
+
         NavigationView navigationView = findViewById(R.id.nav_view);
 
         navigationView.setNavigationItemSelectedListener(
@@ -303,6 +287,45 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
 //        actionbar.setHomeAsUpIndicator(R.drawable.ic_indicator_on);
     }
 
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new DialerFragment(), "Dialer");
+        adapter.addFragment(new CallLogListFragment(), "CallLog");
+        adapter.addFragment(new FavListFragment(), "Fav");
+        adapter.addFragment(new ConversationsListFragment(), "Compose");
+//        adapter.addFragment(new WarningFragment(), "Warning");
+        viewPager.setAdapter(adapter);
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+    }
+
     /**
      * This is a helper class that implements the management of tabs and all
      * details of connecting a ViewPager with associated TabHost. It relies on a
@@ -314,148 +337,148 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
      * switch to the correct paged in the ViewPager whenever the selected tab
      * changes.
      */
-    private class TabsAdapter extends FragmentPagerAdapter implements
-            ViewPager.OnPageChangeListener, ActionBar.TabListener {
-        private final Context mContext;
-        private final ActionBar mActionBar;
-        private final ViewPager mViewPager;
-        private final List<String> mTabs = new ArrayList<String>();
-        private final List<Integer> mTabsId = new ArrayList<Integer>();
-        private boolean hasClearedDetails = false;
-        
-
-        private int mCurrentPosition = -1;
-        /**
-         * Used during page migration, to remember the next position
-         * {@link #onPageSelected(int)} specified.
-         */
-        private int mNextPosition = -1;
-
-        public TabsAdapter(FragmentActivity activity, ActionBar actionBar, ViewPager pager) {
-            super(activity.getSupportFragmentManager());
-            mContext = activity;
-            mActionBar = actionBar;
-            mViewPager = pager;
-            mViewPager.setAdapter(this);
-            mViewPager.setOnPageChangeListener(this);
-        }
-
-        public void addTab(ActionBar.Tab tab, Class<?> clss, int tabId) {
-            mTabs.add(clss.getName());
-            mTabsId.add(tabId);
-            mActionBar.addTab(tab.setTabListener(this));
-            notifyDataSetChanged();
-        }
-        
-        public void removeTabAt(int location) {
-            mTabs.remove(location);
-            mTabsId.remove(location);
-            mActionBar.removeTabAt(location);
-            notifyDataSetChanged();
-        }
-        
-        public Integer getIdForPosition(int position) {
-            if(position >= 0 && position < mTabsId.size()) {
-                return mTabsId.get(position);
-            }
-            return null;
-        }
-        
-        public Integer getPositionForId(int id) {
-            int fPos = mTabsId.indexOf(id);
-            if(fPos >= 0) {
-                return fPos;
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return mTabs.size();
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return Fragment.instantiate(mContext, mTabs.get(position), new Bundle());
-        }
-
-        @Override
-        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-            clearDetails();
-            if (mViewPager.getCurrentItem() != tab.getPosition()) {
-                mViewPager.setCurrentItem(tab.getPosition(), true);
-            }
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            mActionBar.setSelectedNavigationItem(position);
-
-            if (mCurrentPosition == position) {
-                Log.w(THIS_FILE, "Previous position and next position became same (" + position
-                        + ")");
-            }
-
-            mNextPosition = position;
-        }
-
-        @Override
-        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-            // Nothing to do
-        }
-
-        @Override
-        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-            // Nothing to do
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            // Nothing to do
-        }
-
-        /*
-         * public void setCurrentPosition(int position) { mCurrentPosition =
-         * position; }
-         */
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-            switch (state) {
-                case ViewPager.SCROLL_STATE_IDLE: {
-                    if (mCurrentPosition >= 0) {
-                        sendFragmentVisibilityChange(mCurrentPosition, false);
-                    }
-                    if (mNextPosition >= 0) {
-                        sendFragmentVisibilityChange(mNextPosition, true);
-                    }
-                    supportInvalidateOptionsMenu();
-
-                    mCurrentPosition = mNextPosition;
-                    break;
-                }
-                case ViewPager.SCROLL_STATE_DRAGGING:
-                    clearDetails();
-                    hasClearedDetails = true;
-                    break;
-                case ViewPager.SCROLL_STATE_SETTLING:
-                    hasClearedDetails = false;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void clearDetails() {
-            if (mDualPane && !hasClearedDetails) {
-                FragmentTransaction ft = SipHome.this.getSupportFragmentManager()
-                        .beginTransaction();
-                ft.replace(R.id.details, new Fragment(), null);
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                ft.commit();
-            }
-        }
-    }
+//    private class TabsAdapter extends FragmentPagerAdapter implements
+//            ViewPager.OnPageChangeListener, ActionBar.TabListener {
+//        private final Context mContext;
+//        private final ActionBar mActionBar;
+//        private final ViewPager mViewPager;
+//        private final List<String> mTabs = new ArrayList<String>();
+//        private final List<Integer> mTabsId = new ArrayList<Integer>();
+//        private boolean hasClearedDetails = false;
+//
+//
+//        private int mCurrentPosition = -1;
+//        /**
+//         * Used during page migration, to remember the next position
+//         * {@link #onPageSelected(int)} specified.
+//         */
+//        private int mNextPosition = -1;
+//
+//        public TabsAdapter(FragmentActivity activity, ActionBar actionBar, ViewPager pager) {
+//            super(activity.getSupportFragmentManager());
+//            mContext = activity;
+//            mActionBar = actionBar;
+//            mViewPager = pager;
+//            mViewPager.setAdapter(this);
+//            mViewPager.setOnPageChangeListener(this);
+//        }
+//
+//        public void addTab(ActionBar.Tab tab, Class<?> clss, int tabId) {
+//            mTabs.add(clss.getName());
+//            mTabsId.add(tabId);
+//            mActionBar.addTab(tab.setTabListener(this));
+//            notifyDataSetChanged();
+//        }
+//
+//        public void removeTabAt(int location) {
+//            mTabs.remove(location);
+//            mTabsId.remove(location);
+//            mActionBar.removeTabAt(location);
+//            notifyDataSetChanged();
+//        }
+//
+//        public Integer getIdForPosition(int position) {
+//            if(position >= 0 && position < mTabsId.size()) {
+//                return mTabsId.get(position);
+//            }
+//            return null;
+//        }
+//
+//        public Integer getPositionForId(int id) {
+//            int fPos = mTabsId.indexOf(id);
+//            if(fPos >= 0) {
+//                return fPos;
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return mTabs.size();
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position) {
+//            return Fragment.instantiate(mContext, mTabs.get(position), new Bundle());
+//        }
+//
+//        @Override
+//        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+//            clearDetails();
+//            if (mViewPager.getCurrentItem() != tab.getPosition()) {
+//                mViewPager.setCurrentItem(tab.getPosition(), true);
+//            }
+//        }
+//
+//        @Override
+//        public void onPageSelected(int position) {
+//            mActionBar.setSelectedNavigationItem(position);
+//
+//            if (mCurrentPosition == position) {
+//                Log.w(THIS_FILE, "Previous position and next position became same (" + position
+//                        + ")");
+//            }
+//
+//            mNextPosition = position;
+//        }
+//
+//        @Override
+//        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+//            // Nothing to do
+//        }
+//
+//        @Override
+//        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+//            // Nothing to do
+//        }
+//
+//        @Override
+//        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//            // Nothing to do
+//        }
+//
+//        /*
+//         * public void setCurrentPosition(int position) { mCurrentPosition =
+//         * position; }
+//         */
+//
+//        @Override
+//        public void onPageScrollStateChanged(int state) {
+//            switch (state) {
+//                case ViewPager.SCROLL_STATE_IDLE: {
+//                    if (mCurrentPosition >= 0) {
+//                        sendFragmentVisibilityChange(mCurrentPosition, false);
+//                    }
+//                    if (mNextPosition >= 0) {
+//                        sendFragmentVisibilityChange(mNextPosition, true);
+//                    }
+//                    supportInvalidateOptionsMenu();
+//
+//                    mCurrentPosition = mNextPosition;
+//                    break;
+//                }
+//                case ViewPager.SCROLL_STATE_DRAGGING:
+//                    clearDetails();
+//                    hasClearedDetails = true;
+//                    break;
+//                case ViewPager.SCROLL_STATE_SETTLING:
+//                    hasClearedDetails = false;
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//
+//        private void clearDetails() {
+//            if (mDualPane && !hasClearedDetails) {
+//                FragmentTransaction ft = SipHome.this.getSupportFragmentManager()
+//                        .beginTransaction();
+//                ft.replace(R.id.details, new Fragment(), null);
+//                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//                ft.commit();
+//            }
+//        }
+//    }
 
     private DialerFragment mDialpadFragment;
     private CallLogListFragment mCallLogFragment;
@@ -463,41 +486,41 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
     private FavListFragment mPhoneFavoriteFragment;
     private WarningFragment mWarningFragment;
 
-    private Fragment getFragmentAt(int position) {
-        Integer id = mTabsAdapter.getIdForPosition(position);
-        if(id != null) {
-            if (id == TAB_ID_DIALER) {
-                return mDialpadFragment;
-            } else if (id == TAB_ID_CALL_LOG) {
-                return mCallLogFragment;
-            } else if (id == TAB_ID_MESSAGES) {
-                return mMessagesFragment;
-            } else if (id == TAB_ID_FAVORITES) {
-                return mPhoneFavoriteFragment;
-            } else if (id == TAB_ID_WARNING) {
-                return mWarningFragment;
-            }
-        }
-        throw new IllegalStateException("Unknown fragment index: " + position);
-    }
+//    private Fragment getFragmentAt(int position) {
+//        Integer id = mTabsAdapter.getIdForPosition(position);
+//        if(id != null) {
+//            if (id == TAB_ID_DIALER) {
+//                return mDialpadFragment;
+//            } else if (id == TAB_ID_CALL_LOG) {
+//                return mCallLogFragment;
+//            } else if (id == TAB_ID_MESSAGES) {
+//                return mMessagesFragment;
+//            } else if (id == TAB_ID_FAVORITES) {
+//                return mPhoneFavoriteFragment;
+//            } else if (id == TAB_ID_WARNING) {
+//                return mWarningFragment;
+//            }
+//        }
+//        throw new IllegalStateException("Unknown fragment index: " + position);
+//    }
 
-    public Fragment getCurrentFragment() {
-        if (mViewPager != null) {
-            return getFragmentAt(mViewPager.getCurrentItem());
-        }
-        return null;
-    }
+//    public Fragment getCurrentFragment() {
+//        if (mViewPager != null) {
+//            return getFragmentAt(mViewPager.getCurrentItem());
+//        }
+//        return null;
+//    }
 
-    private void sendFragmentVisibilityChange(int position, boolean visibility) {
-        try {
-            final Fragment fragment = getFragmentAt(position);
-            if (fragment instanceof ViewPagerVisibilityListener) {
-                ((ViewPagerVisibilityListener) fragment).onVisibilityChanged(visibility);
-            }
-        }catch(IllegalStateException e) {
-            Log.e(THIS_FILE, "Fragment not anymore managed");
-        }
-    }
+//    private void sendFragmentVisibilityChange(int position, boolean visibility) {
+//        try {
+//            final Fragment fragment = getFragmentAt(position);
+//            if (fragment instanceof ViewPagerVisibilityListener) {
+//                ((ViewPagerVisibilityListener) fragment).onVisibilityChanged(visibility);
+//            }
+//        }catch(IllegalStateException e) {
+//            Log.e(THIS_FILE, "Fragment not anymore managed");
+//        }
+//    }
 
     @Override
     public void onAttachFragment(Fragment fragment) {
@@ -507,9 +530,9 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
         // ViewPager is ready.
         final int currentPosition = mViewPager != null ? mViewPager.getCurrentItem() : -1;
         Integer tabId = null; 
-        if(mTabsAdapter != null) {
-            tabId = mTabsAdapter.getIdForPosition(currentPosition);
-        }
+//        if(mTabsAdapter != null) {
+//            tabId = mTabsAdapter.getIdForPosition(currentPosition);
+//        }
         if (fragment instanceof DialerFragment) {
             mDialpadFragment = (DialerFragment) fragment;
             if (initTabId == tabId && tabId != null && tabId == TAB_ID_DIALER) {
@@ -549,7 +572,6 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
         }
 
     }
-
 
     private void asyncSanityCheck() {
         // if(Compatibility.isCompatible(9)) {
@@ -687,12 +709,12 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
         prefProviderWrapper.setPreferenceBooleanValue(PreferencesWrapper.HAS_BEEN_QUIT, false);
         
         // Set visible the currently selected account
-        sendFragmentVisibilityChange(mViewPager.getCurrentItem(), true);
+//        sendFragmentVisibilityChange(mViewPager.getCurrentItem(), true);
         
         Log.d(THIS_FILE, "WE CAN NOW start SIP service");
         startSipService();
         
-        applyTheme();
+//        applyTheme();
     }
     
     private ArrayList<View> getVisibleLeafs(View v) {
@@ -711,148 +733,148 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
         return res;
     }
 
-    private void applyTheme() {
-        Theme t = Theme.getCurrentTheme(this);
-        if (t != null) {
-            ActionBar ab = getSupportActionBar();
-            if (ab != null) {
-                View vg = getWindow().getDecorView().findViewById(android.R.id.content);
-                // Action bar container
-                ViewGroup abc = (ViewGroup) ((ViewGroup) vg.getParent()).getChildAt(0);
-                //
-                ArrayList<View> leafs = getVisibleLeafs(abc);
-                int i = 0;
-                for (View leaf : leafs) {
-                    if (leaf instanceof ImageView) {
-                        Integer id = mTabsAdapter.getIdForPosition(i);
-                        if (id != null) {
-                            int tabId = id;
-                            Drawable customIcon = null;
-                            switch (tabId) {
-                                case TAB_ID_DIALER:
-                                    customIcon = t.getDrawableResource("ic_ab_dialer");
-                                    break;
-                                case TAB_ID_CALL_LOG:
-                                    customIcon = t.getDrawableResource("ic_ab_history");
-                                    break;
-                                case TAB_ID_MESSAGES:
-                                    customIcon = t.getDrawableResource("ic_ab_text");
-                                    break;
-                                case TAB_ID_FAVORITES:
-                                    customIcon = t.getDrawableResource("ic_ab_favourites");
-                                    break;
-                                default:
-                                    break;
-                            }
-                            if (customIcon != null) {
-                                ((ImageView) leaf).setImageDrawable(customIcon);
-                            }
-
-                            t.applyBackgroundStateListSelectableDrawable((View) leaf.getParent(),
-                                    "tab");
-                            if (i == 0) {
-                                ViewParent tabLayout = leaf.getParent().getParent();
-                                if (tabLayout instanceof LinearLayout) {
-                                    Drawable d = t.getDrawableResource("tab_divider");
-                                    if (d != null) {
-                                       /* UtilityWrapper.getInstance()
-                                                .setLinearLayoutDividerDrawable(
-                                                        (LinearLayout) tabLayout, d);*/
-                                        //change tqc
-                                        /*if(tabLayout instanceof IcsLinearLayout) {
-                                            ((IcsLinearLayout)tabLayout).supportSetDividerDrawable(d);
-                                        }*/
-                                    }
-                                    Integer dim = t.getDimension("tab_divider_padding");
-                                    if (dim != null) {
-                                        //change tqc
-                                       /* UtilityWrapper.getInstance().setLinearLayoutDividerPadding(
-                                                (LinearLayout) tabLayout, dim);*/
-                                    }
-                                }
-                            }
-                            i++;
-                        }
-                    }
-                }
-                if(i > 0) {
-                    t.applyBackgroundDrawable((View) leafs.get(0).getParent().getParent(), "abs_background");
-                }
-                
-                Drawable d = t.getDrawableResource("split_background");
-                if (d != null) {
-                    ab.setSplitBackgroundDrawable(d);
-                }
-                
-                t.applyBackgroundDrawable(vg, "content_background");
-            }
-        }
-    }
+//    private void applyTheme() {
+//        Theme t = Theme.getCurrentTheme(this);
+//        if (t != null) {
+//            ActionBar ab = getSupportActionBar();
+//            if (ab != null) {
+//                View vg = getWindow().getDecorView().findViewById(android.R.id.content);
+//                // Action bar container
+//                ViewGroup abc = (ViewGroup) ((ViewGroup) vg.getParent()).getChildAt(0);
+//                //
+//                ArrayList<View> leafs = getVisibleLeafs(abc);
+//                int i = 0;
+//                for (View leaf : leafs) {
+//                    if (leaf instanceof ImageView) {
+//                        Integer id = mTabsAdapter.getIdForPosition(i);
+//                        if (id != null) {
+//                            int tabId = id;
+//                            Drawable customIcon = null;
+//                            switch (tabId) {
+//                                case TAB_ID_DIALER:
+//                                    customIcon = t.getDrawableResource("ic_ab_dialer");
+//                                    break;
+//                                case TAB_ID_CALL_LOG:
+//                                    customIcon = t.getDrawableResource("ic_ab_history");
+//                                    break;
+//                                case TAB_ID_MESSAGES:
+//                                    customIcon = t.getDrawableResource("ic_ab_text");
+//                                    break;
+//                                case TAB_ID_FAVORITES:
+//                                    customIcon = t.getDrawableResource("ic_ab_favourites");
+//                                    break;
+//                                default:
+//                                    break;
+//                            }
+//                            if (customIcon != null) {
+//                                ((ImageView) leaf).setImageDrawable(customIcon);
+//                            }
+//
+//                            t.applyBackgroundStateListSelectableDrawable((View) leaf.getParent(),
+//                                    "tab");
+//                            if (i == 0) {
+//                                ViewParent tabLayout = leaf.getParent().getParent();
+//                                if (tabLayout instanceof LinearLayout) {
+//                                    Drawable d = t.getDrawableResource("tab_divider");
+//                                    if (d != null) {
+//                                       /* UtilityWrapper.getInstance()
+//                                                .setLinearLayoutDividerDrawable(
+//                                                        (LinearLayout) tabLayout, d);*/
+//                                        //change tqc
+//                                        /*if(tabLayout instanceof IcsLinearLayout) {
+//                                            ((IcsLinearLayout)tabLayout).supportSetDividerDrawable(d);
+//                                        }*/
+//                                    }
+//                                    Integer dim = t.getDimension("tab_divider_padding");
+//                                    if (dim != null) {
+//                                        //change tqc
+//                                       /* UtilityWrapper.getInstance().setLinearLayoutDividerPadding(
+//                                                (LinearLayout) tabLayout, dim);*/
+//                                    }
+//                                }
+//                            }
+//                            i++;
+//                        }
+//                    }
+//                }
+//                if(i > 0) {
+//                    t.applyBackgroundDrawable((View) leafs.get(0).getParent().getParent(), "abs_background");
+//                }
+//
+//                Drawable d = t.getDrawableResource("split_background");
+//                if (d != null) {
+//                    ab.setSplitBackgroundDrawable(d);
+//                }
+//
+//                t.applyBackgroundDrawable(vg, "content_background");
+//            }
+//        }
+//    }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        selectTabWithAction(intent);
+//        selectTabWithAction(intent);
     }
 
     private String initDialerWithText = null;
     Integer initTabId = null;
-    private void selectTabWithAction(Intent intent) {
-        if (intent != null) {
-            String callAction = intent.getAction();
-            if (!TextUtils.isEmpty(callAction)) {
-                ActionBar ab = getSupportActionBar();
-                ActionBar.Tab toSelectTab = null;
-                Integer toSelectId = null;
-                if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_DIALER)
-                        || callAction.equalsIgnoreCase(Intent.ACTION_DIAL)
-                        || callAction.equalsIgnoreCase(Intent.ACTION_VIEW)
-                        || callAction.equalsIgnoreCase(Intent.ACTION_SENDTO) /* TODO : sendto should im if not csip? */) {
-                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_DIALER);
-                    if(pos != null) {
-                        toSelectTab = ab.getTabAt(pos);
-                        Uri data = intent.getData();
-                        String nbr = UriUtils.extractNumberFromIntent(intent, this);
-
-                        if (!TextUtils.isEmpty(nbr)) {
-                            if (data != null && mDialpadFragment != null) {
-                                mDialpadFragment.setTextDialing(true);
-                                mDialpadFragment.setTextFieldValue(nbr);
-                            } else {
-                                initDialerWithText = nbr;
-                            }
-                        }
-                        toSelectId = TAB_ID_DIALER;
-                    }
-                } else if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_CALLLOG)) {
-                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_CALL_LOG);
-                    if(pos != null) {
-                        toSelectTab = ab.getTabAt(pos);
-                        toSelectId = TAB_ID_CALL_LOG;
-                    }
-                } else if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_FAVORITES)) {
-                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_FAVORITES);
-                    if(pos != null) {
-                        toSelectTab = ab.getTabAt(pos);
-                        toSelectId = TAB_ID_FAVORITES;
-                    }
-                } else if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_MESSAGES)) {
-                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_MESSAGES);
-                    if(pos != null) {
-                        toSelectTab = ab.getTabAt(pos);
-                        toSelectId = TAB_ID_MESSAGES;
-                    }
-                }
-                if (toSelectTab != null) {
-                    ab.selectTab(toSelectTab);
-                    initTabId = toSelectId;
-                }else {
-                    initTabId = 0;
-                }
-                
-            }
-        }
-    }
+//    private void selectTabWithAction(Intent intent) {
+//        if (intent != null) {
+//            String callAction = intent.getAction();
+//            if (!TextUtils.isEmpty(callAction)) {
+//                ActionBar ab = getSupportActionBar();
+//                ActionBar.Tab toSelectTab = null;
+//                Integer toSelectId = null;
+//                if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_DIALER)
+//                        || callAction.equalsIgnoreCase(Intent.ACTION_DIAL)
+//                        || callAction.equalsIgnoreCase(Intent.ACTION_VIEW)
+//                        || callAction.equalsIgnoreCase(Intent.ACTION_SENDTO) /* TODO : sendto should im if not csip? */) {
+//                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_DIALER);
+//                    if(pos != null) {
+//                        toSelectTab = ab.getTabAt(pos);
+//                        Uri data = intent.getData();
+//                        String nbr = UriUtils.extractNumberFromIntent(intent, this);
+//
+//                        if (!TextUtils.isEmpty(nbr)) {
+//                            if (data != null && mDialpadFragment != null) {
+//                                mDialpadFragment.setTextDialing(true);
+//                                mDialpadFragment.setTextFieldValue(nbr);
+//                            } else {
+//                                initDialerWithText = nbr;
+//                            }
+//                        }
+//                        toSelectId = TAB_ID_DIALER;
+//                    }
+//                } else if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_CALLLOG)) {
+//                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_CALL_LOG);
+//                    if(pos != null) {
+//                        toSelectTab = ab.getTabAt(pos);
+//                        toSelectId = TAB_ID_CALL_LOG;
+//                    }
+//                } else if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_FAVORITES)) {
+//                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_FAVORITES);
+//                    if(pos != null) {
+//                        toSelectTab = ab.getTabAt(pos);
+//                        toSelectId = TAB_ID_FAVORITES;
+//                    }
+//                } else if (callAction.equalsIgnoreCase(SipManager.ACTION_SIP_MESSAGES)) {
+//                    Integer pos = mTabsAdapter.getPositionForId(TAB_ID_MESSAGES);
+//                    if(pos != null) {
+//                        toSelectTab = ab.getTabAt(pos);
+//                        toSelectId = TAB_ID_MESSAGES;
+//                    }
+//                }
+//                if (toSelectTab != null) {
+//                    ab.selectTab(toSelectTab);
+//                    initTabId = toSelectId;
+//                }else {
+//                    initTabId = 0;
+//                }
+//
+//            }
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
@@ -860,7 +882,6 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
         super.onDestroy();
         Log.d(THIS_FILE, "---DESTROY SIP HOME END---");
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -901,11 +922,6 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.home:
-//                Toast.makeText(this, "This is HOME.", Toast.LENGTH_SHORT).show();
-//                mDrawerLayout.openDrawer(GravityCompat.START);
-//                return true;
-
             case ACCOUNTS_MENU:
                 startActivity(new Intent(this, AccountsEditList.class));
                 return true;
@@ -994,12 +1010,8 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
             finish();
         }
     }
-
-    
-    
     
     // Warning view
-    
     private List<String> warningList = new ArrayList<String>();
     private void applyWarning(String warnCode, boolean active) {
         synchronized (warningList) {
@@ -1024,36 +1036,39 @@ public class SipHome extends AppCompatActivity implements OnWarningChanged
         synchronized (warningList) {
             warnList.addAll(warningList);
         }
+
         if(mWarningFragment != null) {
             mWarningFragment.setWarningList(warnList);
             mWarningFragment.setOnWarningChangedListener(this);
         }
+
         if(warnList.size() > 0) {
             // Show warning tab if any to display
-            if(mTabsAdapter.getPositionForId(TAB_ID_WARNING) == null) {
-                // And not yet displayed
-                Log.w(THIS_FILE, "Reason to warn " + warnList);
-                
-                mTabsAdapter.addTab(warningTab, WarningFragment.class, TAB_ID_WARNING);
-                warningTabfadeAnim.start();
-            }
-        }else {
-            // Hide warning tab since nothing to warn about
-            ActionBar ab = getSupportActionBar();
-            int selPos = -1;
-            if(ab != null) {
-                selPos = ab.getSelectedTab().getPosition();
-            }
-            Integer pos = mTabsAdapter.getPositionForId(TAB_ID_WARNING);
-            if(pos != null) {
-                mTabsAdapter.removeTabAt(pos);
-                if(selPos == pos && ab != null) {
-                    ab.selectTab(ab.getTabAt(0));
-                }
-            }
-            if(warningTabfadeAnim.isStarted()) {
-                warningTabfadeAnim.end();
-            }
+//            if(mTabsAdapter.getPositionForId(TAB_ID_WARNING) == null) {
+//                // And not yet displayed
+//                Log.w(THIS_FILE, "Reason to warn " + warnList);
+//
+//                mTabsAdapter.addTab(warningTab, WarningFragment.class, TAB_ID_WARNING);
+//                warningTabfadeAnim.start();
+//            }
+        }
+        else {
+//            // Hide warning tab since nothing to warn about
+//            ActionBar ab = getSupportActionBar();
+//            int selPos = -1;
+//            if(ab != null) {
+//                selPos = ab.getSelectedTab().getPosition();
+//            }
+//            Integer pos = mTabsAdapter.getPositionForId(TAB_ID_WARNING);
+//            if(pos != null) {
+//                mTabsAdapter.removeTabAt(pos);
+//                if(selPos == pos && ab != null) {
+//                    ab.selectTab(ab.getTabAt(0));
+//                }
+//            }
+//            if(warningTabfadeAnim.isStarted()) {
+//                warningTabfadeAnim.end();
+//            }
         }
     }
 

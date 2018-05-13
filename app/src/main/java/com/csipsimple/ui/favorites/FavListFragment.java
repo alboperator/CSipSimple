@@ -41,6 +41,7 @@ public class FavListFragment extends CSSListFragment implements ViewPagerVisibil
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setHasOptionsMenu(true);
+        onVisibilityChanged(true);  // added
     }
 
     @Override

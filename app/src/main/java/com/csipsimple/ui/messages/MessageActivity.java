@@ -49,7 +49,7 @@ public class MessageActivity extends AppCompatActivity implements OnQuitListener
     @Override
     protected void onStart() {
         super.onStart();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

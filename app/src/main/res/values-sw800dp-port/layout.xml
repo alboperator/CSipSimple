@@ -16,7 +16,9 @@
 -->
 <resources>
 
-    <item name="sip_home" type="layout">@layout/sip_home_dual_pane</item>
+    <!--<item name="sip_home" type="layout">@layout/sip_home_dual_pane</item>-->
+    <item name="sip_home" type="layout">@layout/sip_home_one_pane</item>
+
     <item name="dialpad_compose" type="layout">@layout/dialpad_compose_3x5</item>
 
     <bool name="use_dual_panes">true</bool>

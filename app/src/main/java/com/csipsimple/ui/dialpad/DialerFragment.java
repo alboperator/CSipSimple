@@ -173,6 +173,7 @@ public class DialerFragment extends Fragment implements OnClickListener, OnLongC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mDualPane = getResources().getBoolean(R.bool.use_dual_panes);
         digitFormater = new PhoneNumberFormattingTextWatcher();
         // Auto complete list in case of text
@@ -184,11 +185,11 @@ public class DialerFragment extends Fragment implements OnClickListener, OnLongC
         }
 
         setHasOptionsMenu(true);
+        onVisibilityChanged(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.dialer_digit, container, false);
         // Store the backgrounds objects that will be in use later
         /*
@@ -267,6 +268,7 @@ public class DialerFragment extends Fragment implements OnClickListener, OnLongC
         applyTheme(v);
         v.setOnKeyListener(this);
         applyTextToAutoComplete();
+
         return v;
     }
 
@@ -351,17 +353,18 @@ public class DialerFragment extends Fragment implements OnClickListener, OnLongC
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
+
         Intent serviceIntent = new Intent(SipManager.INTENT_SIP_SERVICE);
         // Optional, but here we bundle so just ensure we are using csipsimple package
         serviceIntent.setPackage(activity.getPackageName());
-        getActivity().bindService(serviceIntent, connection,
-                Context.BIND_AUTO_CREATE);
+        getActivity().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
         // timings.addSplit("Bind asked for two");
         if (prefsWrapper == null) {
             prefsWrapper = new PreferencesWrapper(getActivity());
         }
+
         if (dialFeedback == null) {
             dialFeedback = new DialingFeedback(getActivity(), false);
         }
@@ -935,4 +938,6 @@ public class DialerFragment extends Fragment implements OnClickListener, OnLongC
             rewriteTextInfo.setText("");
         }
     }
+
+
 }

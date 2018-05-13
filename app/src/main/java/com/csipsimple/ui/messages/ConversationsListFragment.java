@@ -116,7 +116,9 @@ public class ConversationsListFragment extends CSSListFragment implements ViewPa
 
         lv.addHeaderView(mHeaderView, null, true);
         lv.setOnCreateContextMenuListener(this);
-        
+
+        onVisibilityChanged(true);
+
         return v;
     }
     
@@ -218,8 +220,6 @@ public class ConversationsListFragment extends CSSListFragment implements ViewPa
         }
     }
     
-    
-    
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), SipMessage.THREAD_URI, null, null, null, null);
@@ -266,7 +266,6 @@ public class ConversationsListFragment extends CSSListFragment implements ViewPa
         ConversationListItemViews cri = (ConversationListItemViews) v.getTag();
         viewDetails(position, cri);
     }
-
 
 	/*
     

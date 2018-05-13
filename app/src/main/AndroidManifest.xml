@@ -99,6 +99,7 @@
 
     <application
         android:icon="@drawable/ic_launcher_nightly"
+        android:theme="@style/CustomMaterialTheme"
         android:allowBackup="true"
         android:backupAgent="com.csipsimple.backup.SipBackupAgent"
         android:hardwareAccelerated="true"
@@ -128,7 +129,6 @@
             android:name="com.csipsimple.ui.SipHome"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/CompatTheme"
             android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -171,7 +171,6 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:targetActivity="com.csipsimple.ui.SipHome"
-            android:theme="@style/CompatTheme"
             android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -246,25 +245,21 @@
 
         <!-- Main ui -->
         <activity
-            android:name="com.csipsimple.ui.calllog.CallLogDetailsActivity"
-            android:theme="@style/CompatTheme" />
+            android:name="com.csipsimple.ui.calllog.CallLogDetailsActivity" />
 
         <!-- Accounts -->
         <activity
             android:name="com.csipsimple.ui.filters.AccountFilters"
             android:configChanges="orientation"
-            android:label="@string/filters"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/filters" />
         <activity
             android:name="com.csipsimple.ui.filters.EditFilter"
             android:configChanges="orientation"
-            android:label="@string/filters"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/filters" />
         <activity
             android:name="com.csipsimple.wizards.WizardChooser"
             android:configChanges="orientation"
-            android:label="@string/choose_wizard"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/choose_wizard" />
 
         <!-- Preferences -->
         <activity
@@ -272,8 +267,7 @@
             android:configChanges="orientation"
             android:enabled="@bool/use_hc_prefs"
             android:label="@string/prefs"
-            android:permission="android.permission.CONFIGURE_SIP"
-            android:theme="@style/CompatTheme" >
+            android:permission="android.permission.CONFIGURE_SIP">
             <intent-filter>
                 <action android:name="com.csipsimple.ui.action.PREFS_GLOBAL" />
 
@@ -285,8 +279,7 @@
             android:configChanges="orientation"
             android:enabled="@bool/use_cupcake_prefs"
             android:label="@string/prefs"
-            android:permission="android.permission.CONFIGURE_SIP"
-            android:theme="@style/CompatTheme" >
+            android:permission="android.permission.CONFIGURE_SIP">
             <intent-filter>
                 <action android:name="com.csipsimple.ui.action.PREFS_GLOBAL" />
 
@@ -295,19 +288,16 @@
         </activity>
         <activity
             android:name="com.csipsimple.ui.prefs.cupcake.PrefsLoaderActivity"
-            android:label=""
-            android:theme="@style/CompatTheme" />
+            android:label="" />
         <activity
             android:name="com.csipsimple.ui.prefs.PrefsFilters"
             android:configChanges="orientation"
-            android:label="@string/filters"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/filters" />
         <activity
             android:name="com.csipsimple.ui.prefs.PrefsFast"
             android:configChanges="orientation"
             android:label="@string/prefs_fast"
-            android:permission="android.permission.CONFIGURE_SIP"
-            android:theme="@style/CompatTheme" >
+            android:permission="android.permission.CONFIGURE_SIP">
             <intent-filter>
                 <action android:name="com.csipsimple.ui.action.PREFS_FAST" />
 
@@ -317,20 +307,17 @@
         <activity
             android:name="com.csipsimple.ui.prefs.Codecs"
             android:configChanges="orientation"
-            android:label="@string/codecs"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/codecs" />
         <activity
             android:name="com.csipsimple.ui.prefs.AudioTester"
             android:label="@string/test_audio"
-            android:screenOrientation="portrait"
-            android:theme="@style/CompatTheme" />
+            android:screenOrientation="portrait" />
 
         <!-- Wizards -->
         <activity
             android:name="com.csipsimple.wizards.BasePrefsWizard"
             android:configChanges="orientation"
-            android:label="@string/edit"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/edit" />
 
         <!-- Call management -->
         <receiver
@@ -353,8 +340,7 @@
             android:launchMode="singleTask"
             android:permission="android.permission.USE_SIP"
             android:process=":sipStack"
-            android:taskAffinity=""
-            android:theme="@style/CompatTheme" >
+            android:taskAffinity="">
             <intent-filter>
                 <action android:name="android.intent.action.CALL" />
 
@@ -381,8 +367,7 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:permission="android.permission.CALL_PRIVILEGED"
-            android:targetActivity="com.csipsimple.ui.outgoingcall.OutgoingCallChooser"
-            android:theme="@style/CompatTheme" >
+            android:targetActivity="com.csipsimple.ui.outgoingcall.OutgoingCallChooser">
             <intent-filter>
                 <action android:name="android.intent.action.CALL_PRIVILEGED" />
 
@@ -399,8 +384,7 @@
             android:label="@string/sip_call"
             android:launchMode="singleTask"
             android:permission="android.permission.CALL_PRIVILEGED"
-            android:targetActivity="com.csipsimple.ui.outgoingcall.OutgoingCallChooser"
-            android:theme="@style/CompatTheme" >
+            android:targetActivity="com.csipsimple.ui.outgoingcall.OutgoingCallChooser">
             <intent-filter>
                 <action android:name="android.intent.action.CALL_PRIVILEGED" />
 
@@ -437,8 +421,7 @@
             android:launchMode="singleTask"
             android:permission="android.permission.CONFIGURE_SIP"
             android:process=":sipStack"
-            android:taskAffinity=""
-            android:theme="@style/CompatTheme" >
+            android:taskAffinity="">
             <intent-filter android:priority="10" >
                 <action android:name="com.csipsimple.phone.action.INCALL" />
 
@@ -448,14 +431,12 @@
         <activity
             android:name="com.csipsimple.ui.PickupSipUri"
             android:configChanges="orientation"
-            android:label="@string/pickup_sip_uri"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/pickup_sip_uri" />
         <activity
             android:name="com.csipsimple.ui.incall.InCallMediaControl"
             android:configChanges="orientation"
             android:label="@string/prefs_media"
-            android:taskAffinity="com.csipsimple.ui.incall.InCallActivity"
-            android:theme="@style/CompatTheme" />
+            android:taskAffinity="com.csipsimple.ui.incall.InCallActivity" />
 
         <receiver android:name="com.csipsimple.service.HeadsetButtonReceiver" />
 
@@ -476,8 +457,7 @@
         </receiver>
 
         <activity
-            android:name="com.csipsimple.widgets.AccountWidgetConfigure"
-            android:theme="@style/CompatTheme" >
+            android:name="com.csipsimple.widgets.AccountWidgetConfigure">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -497,8 +477,7 @@
         </receiver>
 
         <activity
-            android:name="com.csipsimple.widgets.ShortcutWidgetConfigure"
-            android:theme="@style/CompatTheme" >
+            android:name="com.csipsimple.widgets.ShortcutWidgetConfigure">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -509,7 +488,6 @@
             android:name="com.csipsimple.ui.messages.MessageActivity"
             android:configChanges="orientation"
             android:launchMode="singleTop"
-            android:theme="@style/CompatTheme"
             android:windowSoftInputMode="stateHidden" />
 
         <!-- Embedded plugins -->
@@ -537,11 +515,8 @@
         <!-- New UI -->
         <activity
             android:name="com.csipsimple.ui.account.AccountsEditList"
-            android:label="@string/accounts"
-            android:theme="@style/CompatTheme" />
-        <activity
-            android:name="com.csipsimple.ui.account.AccountEdit"
-            android:theme="@style/CompatTheme" />
+            android:label="@string/accounts" />
+        <activity android:name="com.csipsimple.ui.account.AccountEdit" />
 
         <!-- Extra codecs -->
 
@@ -563,9 +538,7 @@
 
 
         <!-- Extra wizard creation account activities -->
-        <activity
-            android:name="com.csipsimple.wizards.impl.MondotalkCreate"
-            android:theme="@style/CompatTheme" />
+        <activity android:name="com.csipsimple.wizards.impl.MondotalkCreate" />
 
         <!--Test -->
         <!--<instrumentation android:targetPackage="com.csipsimple"-->

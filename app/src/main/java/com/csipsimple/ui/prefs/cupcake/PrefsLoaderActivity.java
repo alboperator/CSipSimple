@@ -45,7 +45,7 @@ public class PrefsLoaderActivity extends GenericPrefs {
         setTitle(PrefsLogic.getTitleResourceForType(getPreferenceType()));
         android.app.ActionBar ab = getActionBar();
         if(ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
+//            ab.setDisplayHomeAsUpEnabled(true);
         }
     }
 

@@ -76,7 +76,6 @@
     </style>
 
     <style name="DarkTheme" parent="android:Theme.DeviceDefault"/>
-    <style name="CompatTheme" parent="Theme.AppCompat"/>
 
     <style name="DarkTheme.Dialog" parent="android:Theme.Holo.Light.DarkActionBar">
 
@@ -104,9 +103,16 @@
     </style>
 
     <style name="ButtonBar" parent="@android:style/ButtonBar" />
-
     <style name="ButtonBarButton" parent="@android:style/Widget.Button" />
-
     <style name="ButtonBar.AlertDialog" parent="@android:style/ButtonBar" />
 
+    <style name="CustomMaterialTheme" parent="CustomMaterialTheme.Base" />
+
+    <style name="CustomMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 </resources>

@@ -94,6 +94,7 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
+        onVisibilityChanged(true);  // added
         return inflater.inflate(R.layout.call_log_fragment, container, false);
     }
 
@@ -130,14 +131,12 @@ public class CallLogListFragment extends CSSListFragment implements ViewPagerVis
             }
         });
     }
-    
-    /*
+
     @Override
     public void onResume() {
         super.onResume();
         fetchCalls();
     }
-    */
 
     @Override
     public void fetchCalls() {

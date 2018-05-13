@@ -69,7 +69,7 @@ public class AccountFilters extends AppCompatActivity {
         setContentView(R.layout.account_filters_view);
         listFragment = (AccountFiltersListFragment) getSupportFragmentManager().findFragmentById(R.id.list);
         listFragment.setAccountId(accountId);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -3,5 +3,10 @@
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    class="com.csipsimple.ui.account.AccountsEditListFragment" />
+    class="com.csipsimple.ui.account.AccountsEditListFragment">
 
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/toolbar_layout" />
+</fragment>

@@ -54,12 +54,12 @@ public class Codecs extends AppCompatActivity {
         setContentView(R.layout.codecs_pager);
 
         final ActionBar ab = getSupportActionBar();
-        ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);   // nnnn
         
         ab.setDisplayShowHomeEnabled(true);
         ab.setDisplayShowTitleEnabled(true);
         
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
         TabsAdapter tabAdapter = new TabsAdapter(this, ab, mViewPager);
         useCodecsPerSpeed = SipConfigManager.getPreferenceBooleanValue(this, SipConfigManager.CODECS_PER_BANDWIDTH);
         showVideoCodecs   = SipConfigManager.getPreferenceBooleanValue(this, SipConfigManager.USE_VIDEO);

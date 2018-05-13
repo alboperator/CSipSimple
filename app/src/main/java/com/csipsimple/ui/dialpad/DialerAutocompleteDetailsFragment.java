@@ -75,11 +75,12 @@ public class DialerAutocompleteDetailsFragment extends ListFragment {
             // But not sure how fragments will behaves on restore for now
             Activity superAct = getActivity();
             if (superAct instanceof SipHome) {
-                Fragment frag = ((SipHome) superAct).getCurrentFragment();
-                if (frag != null && frag instanceof DialerFragment) {
-                    ((DialerFragment) frag).setTextFieldValue(autoCompleteAdapter.getFilter()
-                            .convertResultToString(selectedItem));
-                }
+                // fixme: nnnn
+//                Fragment frag = ((SipHome) superAct).getCurrentFragment();
+//                if (frag != null && frag instanceof DialerFragment) {
+//                    ((DialerFragment) frag).setTextFieldValue(autoCompleteAdapter.getFilter()
+//                            .convertResultToString(selectedItem));
+//                }
             }
         }
     }

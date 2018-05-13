@@ -46,7 +46,7 @@ public class CallLogDetailsActivity extends AppCompatActivity implements OnQuitL
 	@Override
 	protected void onStart() {
 		super.onStart();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
 	@Override
