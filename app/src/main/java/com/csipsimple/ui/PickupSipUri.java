@@ -24,6 +24,8 @@ package com.csipsimple.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,10 +39,11 @@ import com.csipsimple.api.SipProfile;
 import com.csipsimple.widgets.EditSipUri;
 import com.csipsimple.widgets.EditSipUri.ToCall;
 
-public class PickupSipUri extends Activity implements OnClickListener {
+public class PickupSipUri extends AppCompatActivity implements OnClickListener {
 
 	private EditSipUri sipUri;
 	private Button okBtn;
+	private Toolbar toolbar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +81,12 @@ public class PickupSipUri extends Activity implements OnClickListener {
 			}
 		});
 		sipUri.setShowExternals(false);
-		
-		
+
+		toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		if(getSupportActionBar() != null) {
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
 	}
 	
 	

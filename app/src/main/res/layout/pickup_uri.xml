@@ -24,8 +24,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
+    <include
+        android:id="@+id/toolbarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/toolbar_layout" />
+
     <com.csipsimple.widgets.EditSipUri
         android:id="@+id/sip_uri"
+        android:layout_below="@+id/toolbarContainer"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/footer"

@@ -122,5 +122,7 @@
     <string name="nav_help">Help</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation Header</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
 
 </resources>

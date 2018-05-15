@@ -101,6 +101,7 @@
         android:icon="@drawable/ic_launcher_nightly"
         android:theme="@style/CustomMaterialTheme"
         android:allowBackup="true"
+        android:name=".App"
         android:backupAgent="com.csipsimple.backup.SipBackupAgent"
         android:hardwareAccelerated="true"
         android:label="@string/app_name">

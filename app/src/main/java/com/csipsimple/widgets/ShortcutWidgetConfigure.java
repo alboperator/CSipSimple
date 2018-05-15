@@ -80,14 +80,13 @@ public class ShortcutWidgetConfigure extends ListActivity {
 		Bundle extras = intent.getExtras();
 		if (extras != null) {
 		    appWidgetId = extras.getInt(
-		            AppWidgetManager.EXTRA_APPWIDGET_ID, 
+		            AppWidgetManager.EXTRA_APPWIDGET_ID,
 		            AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
 		
 		//Result to cancel in case application is quit by user
 		Intent cancelResultValue = new Intent();
-        cancelResultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                        appWidgetId);
+        cancelResultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         setResult(RESULT_CANCELED, cancelResultValue);
 		
         Resources r = getResources();
@@ -102,7 +101,6 @@ public class ShortcutWidgetConfigure extends ListActivity {
                 android.R.layout.simple_list_item_1, new String[] { KEY_TITLE },
                 new int[] { android.R.id.text1 }));
 	}
-	
 
 	private static String getPrefsKey(int widgetId) {
 		return "shortcut" + widgetId + "_action";
@@ -111,7 +109,6 @@ public class ShortcutWidgetConfigure extends ListActivity {
 	public static int getActionForWidget(Context ctx, int widgetId) {
 		SharedPreferences prefs = ctx.getSharedPreferences(WIDGET_PREFS, 0);
         return prefs.getInt(getPrefsKey(widgetId), -1);
-        
 	}
 	
 	public static void deleteWidget(Context ctx, int widgetId) {
@@ -133,17 +130,16 @@ public class ShortcutWidgetConfigure extends ListActivity {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putInt(getPrefsKey(appWidgetId), index);
             edit.commit();
-            
-            
+
             Intent resultValue = new Intent();
-            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                            appWidgetId);
+            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             setResult(RESULT_OK, resultValue);
             
             ShortcutWidgetProvider.updateWidget(this);
             
             finish();
-        }else {
+        }
+        else {
             Log.w(THIS_FILE, "Invalid widget ID here...");
         }
     }

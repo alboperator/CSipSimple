@@ -21,80 +21,98 @@
     along with CSipSimple.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<com.csipsimple.ui.dialpad.DialerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/top_digit_dialer"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:baselineAligned="false"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/right_panel_margin_vertical"
-    android:paddingTop="@dimen/right_panel_margin_vertical" >
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/topField"
+    <com.csipsimple.ui.dialpad.DialerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/top_digit_dialer"
         android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_marginBottom="0dip"
-        android:layout_weight="@integer/dialpad_layout_weight_digits"
-        android:background="@drawable/dialpad_background"
-        android:orientation="horizontal"
-        android:padding="0dip" >
+        android:layout_height="fill_parent"
+        android:baselineAligned="false"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/right_panel_margin_vertical"
+        android:paddingTop="@dimen/right_panel_margin_vertical">
 
-        <!-- Dummy item to prevent DigitsEditText from receiving focus -->
+        <RelativeLayout
+            android:id="@+id/topField"
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_marginBottom="0dip"
+            android:layout_weight="@integer/dialpad_layout_weight_digits"
+            android:background="@drawable/dialpad_background"
+            android:orientation="horizontal"
+            android:padding="0dip" >
 
-        <View
-            android:layout_width="0px"
-            android:layout_height="0px"
-            android:focusable="true"
-            android:focusableInTouchMode="true" />
+            <!-- Dummy item to prevent DigitsEditText from receiving focus -->
 
-        <com.csipsimple.ui.dialpad.DigitsEditText
-            android:id="@+id/digitsText"
+            <View
+                android:layout_width="0px"
+                android:layout_height="0px"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
+
+            <com.csipsimple.ui.dialpad.DigitsEditText
+                android:id="@+id/digitsText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/accountChooserButton"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/description_digits_edittext"
+                android:gravity="center"
+                android:imeActionLabel="@string/call"
+                android:imeOptions="actionGo"
+                android:nextFocusRight="@+id/accountChooserButton"
+                android:textAppearance="@style/DialtactsDigitsTextAppearance"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/rewriteTextInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/accountChooserButton"
+                android:gravity="center"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="italic"
+                android:visibility="gone" />
+
+            <com.csipsimple.widgets.AccountChooserButton
+                android:id="@+id/accountChooserButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true" />
+        </RelativeLayout>
+        <!-- Autocomplete -->
+
+        <ListView
+            android:id="@+id/autoCompleteList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/accountChooserButton"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/description_digits_edittext"
-            android:gravity="center"
-            android:imeActionLabel="@string/call"
-            android:imeOptions="actionGo"
-            android:nextFocusRight="@+id/accountChooserButton"
-            android:textAppearance="@style/DialtactsDigitsTextAppearance"
-            android:textColor="@android:color/white" />
-
-        <TextView
-            android:id="@+id/rewriteTextInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/accountChooserButton"
-            android:gravity="center"
-            android:textColor="#88FFFFFF"
-            android:textSize="10sp"
-            android:textStyle="italic"
+            android:layout_height="0dip"
+            android:layout_weight="@integer/dialpad_layout_weight_autocomplete_list"
             android:visibility="gone" />
 
-        <com.csipsimple.widgets.AccountChooserButton
-            android:id="@+id/accountChooserButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true" />
-    </RelativeLayout>
-    <!-- Autocomplete -->
+        <!-- Keypad section -->
+        <include layout="@layout/dialpad_compose" />
 
-    <ListView
-        android:id="@+id/autoCompleteList"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="@integer/dialpad_layout_weight_autocomplete_list"
-        android:visibility="gone" />
+    </com.csipsimple.ui.dialpad.DialerLayout>
 
-    <!-- Keypad section -->
+     <!--Floating action button -->
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--app:srcCompat="@android:drawable/ic_dialog_email" />-->
 
-    <include layout="@layout/dialpad_compose" />
-
-</com.csipsimple.ui.dialpad.DialerLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -24,12 +24,16 @@ package com.csipsimple.ui.messages;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.csipsimple.R;
 import com.csipsimple.ui.messages.MessageFragment.OnQuitListener;
 import com.csipsimple.utils.Compatibility;
 
 public class MessageActivity extends AppCompatActivity implements OnQuitListener {
+
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,12 @@ public class MessageActivity extends AppCompatActivity implements OnQuitListener
             getSupportFragmentManager().beginTransaction()
                     .add(android.R.id.content, detailFragment).commit();
             detailFragment.setOnQuitListener(this);
+        }
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 

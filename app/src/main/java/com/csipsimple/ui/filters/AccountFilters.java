@@ -25,6 +25,7 @@ package com.csipsimple.ui.filters;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
@@ -39,6 +40,7 @@ public class AccountFilters extends AppCompatActivity {
     private static final String THIS_FILE = "AccountFilters";
     private long accountId = SipProfile.INVALID_ID;
     private AccountFiltersListFragment listFragment;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +71,12 @@ public class AccountFilters extends AppCompatActivity {
         setContentView(R.layout.account_filters_view);
         listFragment = (AccountFiltersListFragment) getSupportFragmentManager().findFragmentById(R.id.list);
         listFragment.setAccountId(accountId);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
